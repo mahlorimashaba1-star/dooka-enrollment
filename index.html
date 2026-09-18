@@ -1,159 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dooka Primary - Official Enrollment 2026</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dooka Primary - Enrollment 2026</title>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 <style>
-*{box-sizing:border-box;font-family:Arial, sans-serif}
-body{background:#f0f7ff;margin:0}
+*{box-sizing:border-box;font-family:Arial,sans-serif}body{background:#f0f7ff;margin:0}
 .header{background:#0a2a4a;color:white;padding:20px;text-align:center}
 .logo{width:110px;height:110px;border-radius:50%;border:4px solid #ffd700;background:white;object-fit:contain}
-.box{background:white;margin:12px;padding:18px;border-radius:14px;border:3px solid #0a2a4a;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
-.input,select,textarea{width:100%;padding:13px;border:2px solid #0a2a4a;border-radius:10px;margin:7px 0;font-weight:bold;font-size:14px}
-.row{display:flex;gap:8px}.row>*{flex:1}
-@media(max-width:600px){.row{flex-direction:column}}
+.box{background:white;margin:12px;padding:18px;border-radius:14px;border:3px solid #0a2a4a}
+.input,select,textarea{width:100%;padding:13px;border:2px solid #0a2a4a;border-radius:10px;margin:7px 0;font-weight:bold}
+.row{display:flex;gap:8px}.row>*{flex:1}@media(max-width:600px){.row{flex-direction:column}}
 .btn{width:100%;padding:16px;border:none;border-radius:12px;font-weight:900;font-size:18px;cursor:pointer;background:#0a2a4a;color:#ffd700}
-.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
-.checks label{background:#eef4ff;padding:9px;border-radius:8px;font-size:12px;border:1px solid #ccc}
 .upload-box{border:2px dashed #0a2a4a;padding:12px;border-radius:10px;margin:10px 0;background:#fffbe6}
-.upload-box b{color:#0a2a4a}
-.file-status{font-size:11px;color:green;font-weight:bold}
+.file-status{font-size:12px;font-weight:bold;color:green}
+.preview{max-width:100%;max-height:120px;border-radius:8px;margin-top:5px;display:none}
 </style>
 </head>
 <body>
 <div class="header">
 <img src="logo.png" class="logo" onerror="this.style.display='none'">
 <h2 style="margin:10px 0 0">DOOKA PRIMARY SCHOOL</h2>
-<p style="color:#ffd700;font-weight:900;margin:5px;letter-spacing:3px">THUTO BOTSHELO</p>
-<p style="font-size:11px;color:#a3d3ff">OFFICIAL ONLINE ENROLLMENT 2026 • LIVE SYSTEM</p>
+<p style="color:#ffd700;font-weight:900;margin:5px">THUTO BOTSHELO</p>
+<p style="font-size:11px;color:#a3d3ff">OFFICIAL ONLINE ENROLLMENT 2026 - FREE SYSTEM</p>
 </div>
-
 <div class="box">
-<h3>👶 Learner Details</h3>
+<h3>👶 Learner</h3>
 <div class="row"><input id="name" class="input" placeholder="Learner Name *"><input id="surname" class="input" placeholder="Surname *"></div>
-<div class="row"><input id="dob" class="input" type="date"><select id="gender" class="input"><option value="">Gender *</option><option>Male</option><option>Female</option></select><select id="grade" class="input"><option value="">Grade Applying *</option><option>Grade R</option><option>Grade 1</option><option>Grade 2</option><option>Grade 3</option><option>Grade 4</option><option>Grade 5</option><option>Grade 6</option><option>Grade 7</option></select></div>
+<div class="row"><input id="dob" class="input" type="date"><select id="gender" class="input"><option value="">Gender *</option><option>Male</option><option>Female</option></select><select id="grade" class="input"><option value="">Grade *</option><option>Grade R</option><option>Grade 1</option><option>Grade 2</option><option>Grade 3</option><option>Grade 4</option><option>Grade 5</option><option>Grade 6</option><option>Grade 7</option></select></div>
 <textarea id="address" class="input" placeholder="Home Address *"></textarea>
 
-<h3>👨‍👩‍👧 Parent / Guardian</h3>
-<div class="row"><input id="parentName" class="input" placeholder="Parent Full Names *"><select id="relation" class="input"><option value="">Relation *</option><option>Mother</option><option>Father</option><option>Guardian</option><option>Grandparent</option></select></div>
-<div class="row"><input id="parentPhone" class="input" placeholder="Phone Number *"><input id="parentID" class="input" placeholder="Parent ID Number"></div>
+<h3>👨‍👩‍👧 Parent</h3>
+<div class="row"><input id="parentName" class="input" placeholder="Parent Full Names *"><select id="relation" class="input"><option value="">Relation *</option><option>Mother</option><option>Father</option><option>Guardian</option></select></div>
+<div class="row"><input id="parentPhone" class="input" placeholder="Phone Number *"><input id="parentID" class="input" placeholder="ID Number"></div>
 
-<h3>📎 Upload Documents (PDF or Photo)</h3>
+<h3>📎 Upload Documents - Take Photo with Phone</h3>
 
 <div class="upload-box">
 <b>1. Child Birth Certificate / Clinic Card *</b><br>
-<input type="file" id="fileBirth" accept=".pdf,.jpg,.jpeg,.png" onchange="checkFile('fileBirth','statusBirth')">
-<span id="statusBirth" class="file-status"></span>
+<input type="file" id="fileBirth" accept="image/*,.pdf" capture="environment" onchange="handleFile(this,'statusBirth','prevBirth')">
+<span id="statusBirth" class="file-status"></span><br><img id="prevBirth" class="preview">
 </div>
 
 <div class="upload-box">
 <b>2. Parent ID Copy *</b><br>
-<input type="file" id="fileParentID" accept=".pdf,.jpg,.jpeg,.png" onchange="checkFile('fileParentID','statusParentID')">
-<span id="statusParentID" class="file-status"></span>
+<input type="file" id="fileParentID" accept="image/*,.pdf" capture="environment" onchange="handleFile(this,'statusParentID','prevParentID')">
+<span id="statusParentID" class="file-status"></span><br><img id="prevParentID" class="preview">
 </div>
 
 <div class="upload-box">
-<b>3. Proof of Residence (Municipal bill / Affidavit) *</b><br>
-<input type="file" id="fileProof" accept=".pdf,.jpg,.jpeg,.png" onchange="checkFile('fileProof','statusProof')">
-<span id="statusProof" class="file-status"></span>
+<b>3. Proof of Residence *</b><br>
+<input type="file" id="fileProof" accept="image/*,.pdf" capture="environment" onchange="handleFile(this,'statusProof','prevProof')">
+<span id="statusProof" class="file-status"></span><br><img id="prevProof" class="preview">
 </div>
 
-<div class="upload-box">
-<b>4. Additional (Optional)</b><br>
-<input type="file" id="fileExtra" accept=".pdf,.jpg,.jpeg,.png">
-</div>
-
-<textarea id="notes" class="input" placeholder="Health Issues / Allergies / Notes"></textarea>
+<textarea id="notes" class="input" placeholder="Health / Notes"></textarea>
 <button id="btnSubmit" class="btn" onclick="submitEnroll()">📨 SUBMIT WITH DOCUMENTS</button>
 <p id="status" style="text-align:center;font-size:13px;margin-top:12px;color:#0a2a4a;font-weight:bold"></p>
-<div style="text-align:center;margin-top:12px"><a href="admin.html" style="font-size:11px;color:#0a2a4a">Admin Desktop →</a></div>
+<div style="text-align:center;margin-top:12px"><a href="admin.html" style="font-size:11px">Admin →</a></div>
 </div>
 
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyCVm-xNEv4IwZ5pk79YFOLOMapnAOlUCrM",
-  authDomain: "dooka-enrollment.firebaseapp.com",
-  projectId: "dooka-enrollment",
-  storageBucket: "dooka-enrollment.firebasestorage.app",
-  messagingSenderId: "75187233656",
-  appId: "1:75187233656:web:962e5eba5b15892c295e8d"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const storage = firebase.storage();
+const firebaseConfig={apiKey:"AIzaSyCVm-xNEv4IwZ5pk79YFOLOMapnAOlUCrM",authDomain:"dooka-enrollment.firebaseapp.com",projectId:"dooka-enrollment",storageBucket:"dooka-enrollment.firebasestorage.app",messagingSenderId:"75187233656",appId:"1:75187233656:web:962e5eba5b15892c295e8d"};
+firebase.initializeApp(firebaseConfig);const db=firebase.firestore();
+let docsData={birth:null,parentID:null,proof:null};
 
-function checkFile(inputId, statusId){
-  let f=document.getElementById(inputId).files[0];
-  if(f){document.getElementById(statusId).innerText='✅ Selected: '+f.name+' ('+(f.size/1024).toFixed(0)+' KB)';}
+function handleFile(input,statusId,previewId){
+ let file=input.files[0]; if(!file) return;
+ document.getElementById(statusId).innerText='⏳ Compressing '+file.name+'...';
+ let reader=new FileReader();
+ reader.onload=function(e){
+  if(file.type.startsWith('image/')){
+   compressImage(e.target.result, function(compressed){
+    docsData[statusId.includes('Birth')?'birth':statusId.includes('Parent')?'parentID':'proof']=compressed;
+    document.getElementById(statusId).innerText='✅ Ready: '+(compressed.length/1024).toFixed(0)+' KB';
+    let prev=document.getElementById(previewId); prev.src=compressed; prev.style.display='block';
+   });
+  } else {
+   docsData[statusId.includes('Birth')?'birth':statusId.includes('Parent')?'parentID':'proof']=e.target.result;
+   document.getElementById(statusId).innerText='✅ Ready: '+file.name;
+  }
+ };
+ reader.readAsDataURL(file);
 }
-
-async function uploadFile(file, path){
-  if(!file) return null;
-  let ref=storage.ref().child(path);
-  await ref.put(file);
-  let url=await ref.getDownloadURL();
-  return url;
+function compressImage(dataUrl, callback){
+ let img=new Image(); img.onload=function(){
+  let canvas=document.createElement('canvas'); let maxW=800;
+  let scale=maxW/img.width; if(scale>1) scale=1;
+  canvas.width=img.width*scale; canvas.height=img.height*scale;
+  let ctx=canvas.getContext('2d'); ctx.drawImage(img,0,0,canvas.width,canvas.height);
+  callback(canvas.toDataURL('image/jpeg',0.6));
+ }; img.src=dataUrl;
 }
-
 async function submitEnroll(){
- let n=document.getElementById('name').value.trim();
- let s=document.getElementById('surname').value.trim();
- let g=document.getElementById('grade').value;
- let ge=document.getElementById('gender').value;
- let a=document.getElementById('address').value.trim();
- let pn=document.getElementById('parentName').value.trim();
- let r=document.getElementById('relation').value;
- let pp=document.getElementById('parentPhone').value.trim();
- let f1=document.getElementById('fileBirth').files[0];
- let f2=document.getElementById('fileParentID').files[0];
- let f3=document.getElementById('fileProof').files[0];
- if(!n||!s||!g||!ge||!a||!pn||!r||!pp){alert('Please fill all * fields');return}
- if(!f1||!f2||!f3){alert('Please upload 3 required documents: Birth, Parent ID, Proof of Residence');return}
-
- let btn=document.getElementById('btnSubmit');btn.disabled=true;btn.innerText='Uploading documents...';
- document.getElementById('status').innerText='Uploading files to school... please wait';
-
+ let n=document.getElementById('name').value.trim(), s=document.getElementById('surname').value.trim(), g=document.getElementById('grade').value, ge=document.getElementById('gender').value, a=document.getElementById('address').value.trim(), pn=document.getElementById('parentName').value.trim(), r=document.getElementById('relation').value, pp=document.getElementById('parentPhone').value.trim();
+ if(!n||!s||!g||!ge||!a||!pn||!r||!pp){alert('Fill all * fields');return}
+ if(!docsData.birth||!docsData.parentID||!docsData.proof){alert('Please upload all 3 documents - take photo with phone');return}
+ let btn=document.getElementById('btnSubmit');btn.disabled=true;btn.innerText='Saving...'; document.getElementById('status').innerText='Saving to school...';
  try{
   let adm='DP'+Date.now().toString().slice(-6);
-  let birthUrl=await uploadFile(f1, 'enrollments/'+adm+'/birth_'+f1.name);
-  document.getElementById('status').innerText='1/3 uploaded...';
-  let parentIdUrl=await uploadFile(f2, 'enrollments/'+adm+'/parentID_'+f2.name);
-  document.getElementById('status').innerText='2/3 uploaded...';
-  let proofUrl=await uploadFile(f3, 'enrollments/'+adm+'/proof_'+f3.name);
-  let extraFile=document.getElementById('fileExtra').files[0];
-  let extraUrl=extraFile?await uploadFile(extraFile, 'enrollments/'+adm+'/extra_'+extraFile.name):null;
-  document.getElementById('status').innerText='Saving data...';
-
-  let data={
-   Date:new Date().toLocaleString(),
-   Timestamp:Date.now(),
-   AdmissionNo:adm,
-   Name:n,Surname:s,FullName:n+' '+s,
-   DOB:document.getElementById('dob').value,
-   Gender:ge,Grade:g,Address:a,
-   ParentName:pn,Relation:r,ParentPhone:pp,
-   ParentID:document.getElementById('parentID').value,
-   BirthCertUrl:birthUrl,
-   ParentIDUrl:parentIdUrl,
-   ProofUrl:proofUrl,
-   ExtraUrl:extraUrl||'',
-   Notes:document.getElementById('notes').value,
-   Status:'Pending',Fee:'Pending'
-  };
+  let data={Date:new Date().toLocaleString(),Timestamp:Date.now(),AdmissionNo:adm,Name:n,Surname:s,FullName:n+' '+s,DOB:document.getElementById('dob').value,Gender:ge,Grade:g,Address:a,ParentName:pn,Relation:r,ParentPhone:pp,ParentID:document.getElementById('parentID').value,BirthCertFile:docsData.birth,ParentIDFile:docsData.parentID,ProofFile:docsData.proof,Notes:document.getElementById('notes').value,Status:'Pending'};
   await db.collection('enrollments').add(data);
-  document.getElementById('status').innerText='✅ SUCCESS! Docs uploaded. Admission No: '+adm;
-  alert('✅ Enrolled with documents! Admission No: '+adm+'\nSchool will contact you.');
-  location.reload();
- }catch(e){
-  document.getElementById('status').innerText='❌ Error: '+e.message;
-  console.log(e);
-  btn.disabled=false;btn.innerText='📨 SUBMIT WITH DOCUMENTS';
-  alert('Upload failed: '+e.message+'\n\nGo to Firebase > Storage > Rules > set allow read, write: if true;');
- }
+  document.getElementById('status').innerText='✅ SUCCESS! Admission No: '+adm;
+  alert('✅ Enrolled! No: '+adm); location.reload();
+ }catch(e){document.getElementById('status').innerText='❌ '+e.message; btn.disabled=false; btn.innerText='📨 SUBMIT WITH DOCUMENTS'; alert('Error: '+e.message+'\nCheck Firestore Rules is allow read, write: if true');}
 }
 </script>
 </body>
