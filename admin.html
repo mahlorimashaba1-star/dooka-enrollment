@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dooka Admin - Desktop LIVE</title>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+<style>
+*{box-sizing:border-box;font-family:Arial}body{margin:0;background:#eef2ff}
+.topbar{background:#0a2a4a;color:white;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
+.logo{width:50px;height:50px;border-radius:50%;border:2px solid #ffd700;background:white;object-fit:contain}
+.sidebar{width:280px;background:white;position:fixed;left:0;top:72px;bottom:0;padding:14px;border-right:3px solid #0a2a4a;overflow-y:auto}
+.main{margin-left:280px;padding:14px}
+@media(max-width:900px){.sidebar{position:relative;width:100%;top:0}.main{margin-left:0}}
+.box{background:white;padding:14px;border-radius:10px;border:2px solid #0a2a4a;margin-bottom:12px}
+.input,select{width:100%;padding:10px;border:2px solid #0a2a4a;border-radius:8px;margin:5px 0;font-weight:bold}
+.btn{width:100%;padding:11px;border:none;border-radius:8px;font-weight:900;cursor:pointer;margin-top:7px}
+.btn-blue{background:#0a2a4a;color:#ffd700}.btn-green{background:#22c55e;color:white}.btn-orange{background:#ff8c00;color:white}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px}
+.stat{background:#0a2a4a;color:white;padding:14px;border-radius:10px;text-align:center}
+.stat h3{color:#ffd700;font-size:28px;margin:0}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th,td{border:1px solid #ccc;padding:8px;text-align:left}
+th{background:#0a2a4a;color:#ffd700;position:sticky;top:0}
+</style></head><body>
+<div class="topbar"><div style="display:flex;align-items:center;gap:12px"><img src="logo.png" class="logo"><div><b>DOOKA PRIMARY - DESKTOP ADMIN</b><br><span style="font-size:10px;color:#ffd700">THUTO BOTSHELO • <span id="liveDot">● Connecting...</span></span></div></div><div><a href="index.html" target="_blank" style="color:#ffd700;font-size:12px">Parent Form</a></div></div>
+
+<div class="sidebar">
+<h4>🔍 Filter & Search</h4>
+<input id="search" class="input" placeholder="Search name / phone / admission" onkeyup="render()">
+<select id="filterStatus" class="input" onchange="render()"><option value="">All Status</option><option>Pending</option><option>Approved</option><option>Rejected</option></select>
+<select id="filterGrade" class="input" onchange="render()"><option value="">All Grades</option><option>Grade R</option><option>Grade 1</option><option>Grade 2</option><option>Grade 3</option><option>Grade 4</option><option>Grade 5</option><option>Grade 6</option><option>Grade 7</option></select>
+<hr>
+<button class="btn btn-green" onclick="exportExcel()">📥 Export ALL to Excel</button>
+<button class="btn btn-blue" onclick="exportApproved()">✅ Export Approved Only</button>
+<button class="btn btn-orange" onclick="window.print()">🖨️ Print List</button>
+<div style="margin-top:14px;font-size:11px" id="sideStats"></div>
+</div>
+
+<div class="main">
+<div class="stat-grid"><div class="stat"><h3 id="total">0</h3><p>Total Online</p></div><div class="stat"><h3 id="pending">0</h3><p>Pending</p></div><div class="stat"><h3 id="approved">0</h3><p>Approved</p></div><div class="stat"><h3 id="today">0</h3><p>Today</p></div></div>
+<div class="box"><h3 style="margin:0">📋 Live Enrollments (<span id="count">0</span>) - Auto Refresh</h3>
+<div style="overflow:auto;max-height:75vh"><table><thead><tr><th>Date</th><th>Adm No</th><th>Learner</th><th>Grade</th><th>Parent & Contact</th><th>Docs</th><th>Status</th><th>Action</th></tr></thead><tbody id="tbody"><tr><td colspan="8">Connecting to Firebase...</td></tr></tbody></table></div></div>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCVm-xNEv4IwZ5pk79YFOLOMapnAOlUCrM",
+  authDomain: "dooka-enrollment.firebaseapp.com",
+  projectId: "dooka-enrollment",
+  storageBucket: "dooka-enrollment.firebasestorage.app",
+  messagingSenderId: "75187233656",
+  appId: "1:75187233656:web:962e5eba5b15892c295e8d"
+};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.firestore();
+let allDocs=[];let filtered=[];
+db.collection('enrollments').orderBy('Timestamp','desc').onSnapshot(snap=>{
+ document.getElementById('liveDot').innerText='● LIVE ONLINE';
+ document.getElementById('liveDot').style.color='#22c55e';
+ allDocs=[];snap.forEach(doc=>{allDocs.push({id:doc.id,...doc.data()})});render();
+},err=>{
+ document.getElementById('tbody').innerHTML='<tr><td colspan="8">Error: '+err.message+'<br><br>Go to Firestore > Rules > Set to allow read, write: if true;</td></tr>';
+ document.getElementById('liveDot').innerText='● Rules Error';
+});
+
+function render(){
+ let s=(document.getElementById('search').value||'').toLowerCase();
+ let fs=document.getElementById('filterStatus').value;
+ let fg=document.getElementById('filterGrade').value;
+ filtered=allDocs.filter(l=>{return (!s||(l.FullName+' '+l.ParentName+' '+l.ParentPhone+' '+l.AdmissionNo).toLowerCase().includes(s))&&(!fs||l.Status===fs)&&(!fg||l.Grade===fg);});
+ document.getElementById('count').innerText=filtered.length;
+ document.getElementById('total').innerText=allDocs.length;
+ document.getElementById('pending').innerText=allDocs.filter(l=>l.Status==='Pending').length;
+ document.getElementById('approved').innerText=allDocs.filter(l=>l.Status==='Approved').length;
+ document.getElementById('today').innerText=allDocs.filter(l=>{let d=new Date().toLocaleDateString();return l.Date.includes(d)}).length;
+ document.getElementById('sideStats').innerHTML=`Total: ${allDocs.length}<br>Pending: ${allDocs.filter(l=>l.Status==='Pending').length}<br>Approved: ${allDocs.filter(l=>l.Status==='Approved').length}<br><br>`+['Grade R','Grade 1','Grade 2','Grade 3','Grade 4','Grade 5','Grade 6','Grade 7'].map(g=>`${g}: ${allDocs.filter(l=>l.Grade===g).length}`).join('<br>');
+ let html='';filtered.forEach(l=>{
+  let docs=[l.DocBirth==='Yes'?'BC':'',l.DocClinic==='Yes'?'CC':'',l.DocParentID==='Yes'?'ID':'',l.DocProof==='Yes'?'PR':''].filter(Boolean).join(',');
+  html+=`<tr><td style="font-size:10px">${l.Date}</td><td><b>${l.AdmissionNo}</b></td><td><b>${l.FullName}</b><br>${l.Gender} ${l.DOB||''}</td><td>${l.Grade}</td><td>${l.ParentName} (${l.Relation})<br><b>${l.ParentPhone}</b><br><span style="font-size:10px">${l.Address||''}</span></td><td style="font-size:10px">${docs||'None'}<br>${l.Notes||''}</td><td><span style="background:${l.Status==='Approved'?'#22c55e':l.Status==='Rejected'?'#ef4444':'#fbbf24'};color:${l.Status==='Pending'?'black':'white'};padding:3px 8px;border-radius:12px;font-size:10px;font-weight:900">${l.Status}</span></td><td><select onchange="setStatus('${l.id}',this.value)" style="font-size:11px;padding:5px"><option ${l.Status==='Pending'?'selected':''}>Pending</option><option ${l.Status==='Approved'?'selected':''}>Approved</option><option ${l.Status==='Rejected'?'selected':''}>Rejected</option></select><br><button onclick="delOne('${l.id}','${l.FullName}')" style="background:red;color:white;border:none;padding:5px 7px;border-radius:4px;margin-top:5px;font-size:10px">Delete</button></td></tr>`;
+ });
+ document.getElementById('tbody').innerHTML=html||'<tr><td colspan="8">No enrollments yet - share parent link</td></tr>';
+}
+async function setStatus(id,v){await db.collection('enrollments').doc(id).update({Status:v});}
+async function delOne(id,name){if(confirm('Delete '+name+'?')){await db.collection('enrollments').doc(id).delete();}}
+function exportExcel(){if(!allDocs.length)return alert('No data');let ws=XLSX.utils.json_to_sheet(allDocs.map(({id,Timestamp,...rest})=>rest));let wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'All');XLSX.writeFile(wb,'Dooka_ALL_'+new Date().toISOString().slice(0,10)+'.xlsx');}
+function exportApproved(){let a=allDocs.filter(l=>l.Status==='Approved');if(!a.length)return alert('No approved');let ws=XLSX.utils.json_to_sheet(a.map(({id,Timestamp,...rest})=>rest));let wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Approved');XLSX.writeFile(wb,'Dooka_APPROVED_'+new Date().toISOString().slice(0,10)+'.xlsx');}
+</script>
+</body></html>
