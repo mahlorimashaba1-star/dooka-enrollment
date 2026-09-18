@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dooka Admin - MAROON</title>
+<title>Dooka Admin - MAROON FINAL</title>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <style>
@@ -18,56 +18,71 @@
 .doc-btn{display:inline-block;padding:6px 10px;margin:3px;background:#800000;color:#ffd700;border-radius:6px;font-size:12px;font-weight:bold;text-decoration:none;cursor:pointer}
 .preview-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;justify-content:center;align-items:center;flex-direction:column}
 .preview-modal img{max-width:95%;max-height:80%;border:4px solid white;border-radius:10px;background:white}
+.summary-bar{background:#800000;color:#ffd700;padding:10px;border-radius:8px;margin:8px 0;font-weight:bold;text-align:center;font-size:13px}
 </style>
 </head>
 <body>
 <div class="top">
 <div><b>DOOKA ADMIN</b> <span id="conn" style="font-size:10px;background:red;padding:3px 7px;border-radius:10px">● OFFLINE</span><br><span id="count" style="font-size:11px;color:#ffd700">Loading...</span></div>
-<div><button class="btn btn-white" onclick="load()">🔄 Refresh</button><button class="btn btn-gold" onclick="exportCSV()">📥 Excel</button><a href="index.html" class="btn btn-white" style="text-decoration:none">Form</a></div>
+<div><button class="btn btn-white" onclick="load()">🔄 Refresh</button><button class="btn btn-gold" onclick="exportCSV()">📥 Excel ALL</button></div>
 </div>
+
 <div class="box">
 <div style="display:flex;gap:6px"><input id="search" class="input" placeholder="Search name/phone/admission..." oninput="filter()"><select id="filterGrade" class="input" onchange="filter()"><option value="">All Grades</option><option>Grade R</option><option>Grade 1</option><option>Grade 2</option><option>Grade 3</option><option>Grade 4</option><option>Grade 5</option><option>Grade 6</option><option>Grade 7</option></select></div>
-<div id="stats" style="font-size:12px;font-weight:bold;margin-top:6px"></div>
+<div id="stats" class="summary-bar">Loading stats...</div>
 </div>
-<div id="list" class="box"><p>Loading...</p></div>
+
+<div id="list" class="box"><p>Loading enrollments...</p></div>
+
 <div id="modal" class="preview-modal" onclick="this.style.display='none'">
 <img id="modalImg" src=""><br>
-<button class="btn btn-white" style="margin-top:10px" onclick="document.getElementById('modal').style.display='none'">✖ Close</button>
-<a id="modalDownload" class="btn btn-gold" download="document.jpg" style="margin-top:10px;text-decoration:none">⬇ Download</a>
+<div><button class="btn btn-white" style="margin-top:10px" onclick="document.getElementById('modal').style.display='none'">✖ Close</button>
+<a id="modalDownload" class="btn btn-gold" download="document.jpg" style="margin-top:10px;text-decoration:none">⬇ Download</a></div>
 </div>
+
 <script>
 const firebaseConfig={apiKey:"AIzaSyCVm-xNEv4IwZ5pk79YFOLOMapnAOlUCrM",authDomain:"dooka-enrollment.firebaseapp.com",projectId:"dooka-enrollment",storageBucket:"dooka-enrollment.firebasestorage.app",messagingSenderId:"75187233656",appId:"1:75187233656:web:962e5eba5b15892c295e8d"};
 firebase.initializeApp(firebaseConfig);const db=firebase.firestore();
 let allData=[];
+
 async function load(){
  document.getElementById('conn').innerText='● CONNECTING...'; document.getElementById('conn').style.background='orange';
  try{
   let snap=await db.collection('enrollments').orderBy('Timestamp','desc').get();
   allData=[]; snap.forEach(d=>{let o=d.data();o.id=d.id;allData.push(o)});
   document.getElementById('conn').innerText='● LIVE ONLINE'; document.getElementById('conn').style.background='green';
-  document.getElementById('count').innerText=allData.length+' Total - MAROON FREE VERSION';
-  document.getElementById('stats').innerText='Pending: '+allData.filter(x=>x.Status=='Pending').length+' | Approved: '+allData.filter(x=>x.Status=='Approved').length;
+  updateStats();
   render(allData);
  }catch(e){
   document.getElementById('conn').innerText='● RULES ERROR'; document.getElementById('conn').style.background='red';
-  document.getElementById('list').innerHTML='<p style="color:red">Firestore Rules Error - Set allow read,write: if true</p>';
+  document.getElementById('list').innerHTML='<p style="color:red">Firestore Rules Error - Go Firebase Console > Firestore > Rules > allow read, write: if true > Publish</p>';
  }
 }
+
+function updateStats(){
+ let total=allData.length;
+ let accepted=allData.filter(x=>x.Status=='Approved').length;
+ let pending=allData.filter(x=>x.Status=='Pending').length;
+ let rejected=allData.filter(x=>x.Status=='Rejected').length;
+ document.getElementById('count').innerText=total+' Total | ✅ '+accepted+' Accepted';
+ document.getElementById('stats').innerHTML=`TOTAL: ${total} | ✅ ACCEPTED: ${accepted} | ⏳ PENDING: ${pending} | ❌ REJECTED: ${rejected} | GRADE R: ${allData.filter(x=>x.Grade=='Grade R').length} | GRADE 1: ${allData.filter(x=>x.Grade=='Grade 1').length}`;
+}
+
 function render(data){
- let html=''; if(data.length==0){html='<p>No records</p>';} else {
+ let html=''; if(data.length==0){html='<p>No records found</p>';} else {
   data.forEach((x,i)=>{
    html+=`<div class="card">
    <span class="badge ${x.Status=='Approved'?'approved':x.Status=='Rejected'?'rejected':'pending'}">${x.Status||'Pending'}</span>
-   <b>#${i+1} ${x.FullName||''}</b> <small>Adm: ${x.AdmissionNo||''}</small><br>
-   <small>Grade: ${x.Grade} | ${x.Gender} | DOB: ${x.DOB||''}</small><br>
-   <small>Parent: ${x.ParentName} (${x.Relation}) - ${x.ParentPhone}</small><br>
-   <small>📞 ${x.ParentPhone} | Alt: ${x.ParentPhone2||'-'} | WA: ${x.WhatsApp||''} | ${x.Email||''}</small><br>
-   <small>🚨 Emergency: ${x.EmergencyName||''} ${x.EmergencyPhone||''}</small><br>
-   <small>Parent2: ${x.Parent2Name||''} ${x.Parent2Phone||''} | Addr: ${x.Address}</small><br>
+   <b>#${i+1} ${x.FullName||(x.Name+' '+x.Surname)}</b> <small>Adm: ${x.AdmissionNo||''}</small><br>
+   <small><b>Learner:</b> ${x.Grade} | ${x.Gender} | DOB: ${x.DOB||''} | Addr: ${x.Address||''}</small><br>
+   <small><b>Parent:</b> ${x.ParentName} (${x.Relation}) - ID: ${x.ParentID||''} - ${x.ParentOccupation||''}</small><br>
+   <small><b>📞 CONTACTS:</b> Cell1: ${x.ParentPhone||''} | Cell2: ${x.ParentPhone2||'-'} | WA: ${x.WhatsApp||''} | Email: ${x.Email||''}</small><br>
+   <small><b>🚨 Emergency:</b> ${x.EmergencyName||''} ${x.EmergencyPhone||''} | <b>Parent2:</b> ${x.Parent2Name||''} ${x.Parent2Phone||''}</small><br>
+   <small><b>Notes:</b> ${x.Notes||'-'}</small><br>
    <div style="margin-top:6px">
-   ${x.BirthCertFile?`<span class="doc-btn" onclick="viewDoc('${x.id}','BirthCertFile')">👶 Birth Cert</span>`:''}
-   ${x.ParentIDFile?`<span class="doc-btn" onclick="viewDoc('${x.id}','ParentIDFile')">🪪 Parent ID</span>`:''}
-   ${x.ProofFile?`<span class="doc-btn" onclick="viewDoc('${x.id}','ProofFile')">🏠 Proof</span>`:''}
+   ${x.BirthCertFile?`<span class="doc-btn" onclick="viewDoc('${x.id}','BirthCertFile')">👶 View Birth Cert</span>`:''}
+   ${x.ParentIDFile?`<span class="doc-btn" onclick="viewDoc('${x.id}','ParentIDFile')">🪪 View Parent ID</span>`:''}
+   ${x.ProofFile?`<span class="doc-btn" onclick="viewDoc('${x.id}','ProofFile')">🏠 View Proof</span>`:''}
    </div>
    <div style="margin-top:8px">
    <button class="btn btn-gold" onclick="setStatus('${x.id}','Approved')">✅ Approve</button>
@@ -79,24 +94,64 @@ function render(data){
   });
  } document.getElementById('list').innerHTML=html;
 }
+
 function viewDoc(id,field){
- let rec=allData.find(a=>a.id==id); let data=rec[field];
- document.getElementById('modalImg').src=data; document.getElementById('modalDownload').href=data; document.getElementById('modal').style.display='flex';
+ let rec=allData.find(a=>a.id==id); if(!rec||!rec[field]) return alert('No document');
+ let data=rec[field];
+ document.getElementById('modalImg').src=data;
+ document.getElementById('modalDownload').href=data;
+ document.getElementById('modal').style.display='flex';
 }
+
 function filter(){
  let q=document.getElementById('search').value.toLowerCase(), g=document.getElementById('filterGrade').value;
- let f=allData.filter(x=>{let m=(x.FullName||'').toLowerCase().includes(q)||(x.ParentPhone||'').includes(q)||(x.AdmissionNo||'').toLowerCase().includes(q); let mg=g?x.Grade==g:true; return m&&mg;});
+ let f=allData.filter(x=>{
+  let txt=((x.FullName||'')+' '+(x.ParentPhone||'')+' '+(x.AdmissionNo||'')+' '+(x.ParentName||'')).toLowerCase();
+  let m=txt.includes(q); let mg=g?x.Grade==g:true; return m&&mg;
+ });
  render(f);
 }
+
 async function setStatus(id,st){await db.collection('enrollments').doc(id).update({Status:st}); load();}
-async function del(id){if(confirm('Delete?')){await db.collection('enrollments').doc(id).delete(); load();}}
+async function del(id){if(confirm('Delete this enrollment?')){await db.collection('enrollments').doc(id).delete(); load();}}
+
 function exportCSV(){
- if(allData.length==0) return alert('No data');
- let rows=[['AdmissionNo','FullName','Grade','Gender','Phone1','Phone2','WhatsApp','Email','Emergency','Parent2','Address','Status','Date']];
- allData.forEach(x=>{rows.push([x.AdmissionNo,x.FullName,x.Grade,x.Gender,x.ParentPhone,x.ParentPhone2,x.WhatsApp,x.Email,x.EmergencyName+' '+x.EmergencyPhone,x.Parent2Name+' '+x.Parent2Phone,x.Address,x.Status,x.Date]);});
+ if(allData.length==0) return alert('No data to export');
+ let headers=["No","AdmissionNo","Date","Status","Learner Name","Surname","FullName","DOB","Gender","Grade","Home Address","Parent Full Names","Relation","ID Number","Occupation","Cellphone Number 1","Cellphone Number 2","WhatsApp Number","Email","Emergency Contact Name","Emergency Phone","Second Parent Name","Second Parent Phone","Birth Cert Uploaded","Parent ID Uploaded","Proof of Residence Uploaded","Health Notes"];
+ let rows=[headers];
+ allData.forEach((x,i)=>{
+  rows.push([i+1,x.AdmissionNo,x.Date,x.Status,x.Name,x.Surname,x.FullName,x.DOB,x.Gender,x.Grade,x.Address,x.ParentName,x.Relation,x.ParentID,x.ParentOccupation,x.ParentPhone,x.ParentPhone2,x.WhatsApp,x.Email,x.EmergencyName,x.EmergencyPhone,x.Parent2Name,x.Parent2Phone,x.BirthCertFile?'Yes':'No',x.ParentIDFile?'Yes':'No',x.ProofFile?'Yes':'No',x.Notes]);
+ });
+ let totalAccepted=allData.filter(a=>a.Status=='Approved').length;
+ let totalPending=allData.filter(a=>a.Status=='Pending').length;
+ let totalRejected=allData.filter(a=>a.Status=='Rejected').length;
+ rows.push([]);
+ rows.push(["","","","","","","","","","","","","TOTAL SUMMARY","","","","","","","","","",""]);
+ rows.push(["","","","","","","","","","","","Total Applications","","",allData.length]);
+ rows.push(["","","","","","","","","","","","TOTAL ACCEPTED (Approved)","","",totalAccepted]);
+ rows.push(["","","","","","","","","","","","Total Pending","","",totalPending]);
+ rows.push(["","","","","","","","","","","","Total Rejected","","",totalRejected]);
+ rows.push([]);
+ rows.push(["","","","","","","","","","","","BREAKDOWN BY GRADE"]);
+ rows.push(["","","","","","","","","","","","Grade R","","",allData.filter(a=>a.Grade=='Grade R').length]);
+ rows.push(["","","","","","","","","","","","Grade 1","","",allData.filter(a=>a.Grade=='Grade 1').length]);
+ rows.push(["","","","","","","","","","","","Grade 2","","",allData.filter(a=>a.Grade=='Grade 2').length]);
+ rows.push(["","","","","","","","","","","","Grade 3","","",allData.filter(a=>a.Grade=='Grade 3').length]);
+ rows.push(["","","","","","","","","","","","Grade 4","","",allData.filter(a=>a.Grade=='Grade 4').length]);
+ rows.push(["","","","","","","","","","","","Grade 5","","",allData.filter(a=>a.Grade=='Grade 5').length]);
+ rows.push(["","","","","","","","","","","","Grade 6","","",allData.filter(a=>a.Grade=='Grade 6').length]);
+ rows.push(["","","","","","","","","","","","Grade 7","","",allData.filter(a=>a.Grade=='Grade 7').length]);
+ rows.push([]);
+ rows.push(["","","","","","","","","","","","Report Generated:",new Date().toLocaleString()]);
+
  let csv=rows.map(r=>r.map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
- let blob=new Blob([csv],{type:'text/csv'}); let url=URL.createObjectURL(blob); let a=document.createElement('a'); a.href=url; a.download='dooka_enrollments.csv'; a.click();
+ let blob=new Blob([csv],{type:'text/csv'}); let url=URL.createObjectURL(blob);
+ let a=document.createElement('a'); a.href=url;
+ a.download='Dooka_ALL_HEADINGS_'+new Date().toISOString().slice(0,10)+'_TOTAL-'+allData.length+'_ACCEPTED-'+totalAccepted+'.csv';
+ a.click();
+ alert('✅ Excel exported!\n\nALL Headings: 27 columns\nTotal Applications: '+allData.length+'\n✅ TOTAL ACCEPTED: '+totalAccepted+'\n⏳ Pending: '+totalPending);
 }
+
 load();
 </script>
 </body>
