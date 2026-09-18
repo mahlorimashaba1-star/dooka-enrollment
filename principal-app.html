@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dooka - Principal</title>
+<style>
+body{margin:0;font-family:Segoe UI,sans-serif;background:#fdf8f5}
+.header{background:#7b2c2c;color:white;padding:20px;text-align:center}
+.header img{width:70px;height:70px;border-radius:50%;background:white;padding:5px}
+.card{background:white;margin:12px;padding:15px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.btn{background:#7b2c2c;color:white;border:none;padding:14px;border-radius:10px;width:100%;font-weight:bold}
+input,select,textarea{width:100%;padding:11px;margin:6px 0;border:1px solid #ccc;border-radius:8px}
+</style>
+</head>
+<body>
+<div class="header">
+<img src="logo.png" onerror="this.src='https://via.placeholder.com/70?text=D'">
+<h2>Dooka Primary School</h2>
+<p>Principal Panel</p>
+</div>
+
+<div class="card" id="loginBox">
+<h3>🔐 Principal Login</h3>
+<input id="pin" type="password" placeholder="Enter PIN">
+<button class="btn" onclick="login()">Login</button>
+<p style="font-size:11px;margin-top:6px">PIN: Dooka2026</p>
+</div>
+
+<div class="card" id="postBox" style="display:none">
+<h3>📢 Post Meeting / Event</h3>
+<select id="type"><option value="meeting">📅 Meeting</option><option value="event">🎉 Event</option><option value="urgent">🚨 Urgent</option></select>
+<input id="title" placeholder="Title e.g. Staff Meeting">
+<input id="date" type="date"><input id="time" type="time">
+<textarea id="desc" rows="3" placeholder="Venue, Agenda, Details..."></textarea>
+<button class="btn" onclick="post()">Post & Notify Teachers</button>
+<button class="btn" style="background:#555;margin-top:8px" onclick="location.reload()">Logout</button>
+</div>
+
+<div id="list"></div>
+
+<script>
+function login(){
+ if(document.getElementById('pin').value==='Dooka2026'){
+  document.getElementById('loginBox').style.display='none';
+  document.getElementById('postBox').style.display='block';
+  alert('Welcome Principal!');
+  render();
+ } else alert('Wrong PIN');
+}
+function post(){
+ let obj={type:type.value,title:title.value,date:date.value,time:time.value,desc:desc.value,posted:new Date().toLocaleString()};
+ if(!obj.title) return alert('Add title');
+ let arr=JSON.parse(localStorage.getItem('dooka_staff_v2')||'[]');
+ arr.unshift(obj);
+ localStorage.setItem('dooka_staff_v2',JSON.stringify(arr));
+ alert('Posted! Teachers will get notification');
+ title.value='';desc.value='';
+ render();
+}
+function render(){
+ let arr=JSON.parse(localStorage.getItem('dooka_staff_v2')||'[]');
+ let h='<div class="card"><b>Posted Updates ('+arr.length+')</b></div>';
+ arr.forEach(d=>{
+  h+=`<div class="card" style="border-left:5px solid #7b2c2c"><b>${d.type.toUpperCase()}</b> - ${d.posted}<h3>${d.title}</h3><p>${d.date} ${d.time}</p><p>${d.desc}</p><button onclick="del(${d.posted})" style="color:red;border:none;background:none">Delete</button></div>`;
+ });
+ document.getElementById('list').innerHTML=h;
+}
+function del(){}
+render();
+</script>
+</body>
+</html>

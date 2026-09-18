@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dooka - Teachers</title>
+<style>
+body{margin:0;font-family:Segoe UI,sans-serif;background:#fdf8f5}
+.header{background:#7b2c2c;color:white;padding:20px;text-align:center}
+.header img{width:70px;height:70px;border-radius:50%;background:white;padding:5px}
+.card{background:white;margin:12px;padding:15px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.1);border-left:5px solid #7b2c2c}
+.btn{background:#7b2c2c;color:white;border:none;padding:14px;border-radius:10px;width:100%;font-weight:bold;font-size:15px}
+.badge{padding:4px 8px;border-radius:6px;color:white;font-size:11px;font-weight:bold}
+</style>
+</head>
+<body>
+<div class="header">
+<img src="logo.png" onerror="this.src='https://via.placeholder.com/70?text=D'">
+<h2>Dooka Primary School</h2>
+<p>Staff Updates - Teachers</p>
+</div>
+
+<div class="card" style="text-align:center;background:#fff8f0">
+<h3>👋 Welcome Teacher</h3>
+<button class="btn" onclick="enableNoti()">🔔 Enable Meeting Notifications</button>
+<p style="font-size:12px;margin-top:8px">Click once to get alerts for meetings & events even when app is closed</p>
+</div>
+
+<div id="list"><div class="card">Loading updates...</div></div>
+
+<script>
+let data=JSON.parse(localStorage.getItem('dooka_staff_v2')||'[]');
+function render(){
+ let h='';
+ data.forEach(d=>{
+  let col=d.type==='urgent'?'#d00':d.type==='meeting'?'#007aff':'#2e7d32';
+  h+=`<div class="card" style="border-left-color:${col}"><span class="badge" style="background:${col}">${d.type.toUpperCase()}</span> <small style="float:right">${d.posted}</small><h3 style="margin:8px 0">${d.title}</h3><p>📅 ${d.date} ⏰ ${d.time}</p><p>${d.desc}</p></div>`;
+ });
+ document.getElementById('list').innerHTML=h||'<div class="card">No meetings yet - Principal will post here</div>';
+}
+function enableNoti(){
+ Notification.requestPermission().then(p=>{
+  if(p==='granted'){new Notification('Dooka Teachers','✅ Notifications ON! You will receive meeting alerts');alert('Notifications ON! ✅');}
+  else alert('Please Allow notifications in browser settings');
+ });
+ // Listen for updates from principal
+ setInterval(()=>{
+  let newData=JSON.parse(localStorage.getItem('dooka_staff_v2')||'[]');
+  if(newData.length>data.length && Notification.permission==='granted'){
+   let latest=newData[0];
+   new Notification('Dooka: '+latest.title,{body:latest.date+' '+latest.time+' - '+latest.desc});
+  }
+  data=newData;render();
+ },3000);
+}
+render();
+// Auto refresh every 5 sec
+setInterval(()=>{data=JSON.parse(localStorage.getItem('dooka_staff_v2')||'[]');render()},5000);
+
+// Check reminder - 1 hour before
+setInterval(()=>{
+ let now=new Date();
+ data.forEach(d=>{
+  if(!d.date||!d.time)return;
+  let mt=new Date(d.date+'T'+d.time);
+  let diff=mt-now;
+  if(diff>0 && diff<3600000 && diff>3500000){
+   if(Notification.permission==='granted') new Notification('⏰ Reminder in 1 hour: '+d.title,{body:d.desc});
+  }
+ });
+},60000);
+</script>
+</body>
+</html>
