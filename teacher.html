@@ -20,18 +20,18 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const messaging = getMessaging(app);
+const VAPID_KEY = "BIOkrx7Xuj4CFlcCuvEZj0hmGcxeCbxvY_qWZh2FfgiHUcqOz8CNt2fovCTpwaAJxk7DJLmt79CiYgeNkIzZiyI";
 
 window.enableCloud = async () => {
   try{
     const permission = await Notification.requestPermission();
     if(permission!== 'granted') return alert('Please Allow Notifications');
-    // PASTE YOUR VAPID KEY HERE - replace below
-    const VAPID_KEY = "YOUR_VAPID_KEY_HERE";
     const token = await getToken(messaging, {vapidKey: VAPID_KEY});
-    console.log('Token:', token);
+    console.log('FCM Token:', token);
+    localStorage.setItem('fcm_token', token);
     alert('✅ Cloud Notifications ON! You will get alerts like WhatsApp');
-    new Notification('Dooka Teachers', {body:'Notifications ON! You will receive meetings'});
-  }catch(e){ alert('Enable in HTTPS only. Error: '+e.message); }
+    new Notification('Dooka Teachers', {body:'✅ Notifications ON! Close app and test.'});
+  }catch(e){ alert('Error: '+e.message+' - Make sure you use HTTPS link'); }
 }
 
 const q = query(collection(db, "updates"), orderBy("created","desc"));
@@ -40,25 +40,21 @@ onSnapshot(q, (snap)=>{
   snap.forEach(doc=>{
     let d=doc.data();
     let col=d.type==='urgent'?'#d00':d.type==='meeting'?'#007aff':'#2e7d32';
-    html+=`<div class="card" style="border-left:5px solid ${col}"><span class="badge" style="background:${col}">${d.type?.toUpperCase()}</span><small style="float:right">${d.posted||''}</small><h3 style="margin:8px 0">${d.title}</h3><p>📅 ${d.date||''} ⏰ ${d.time||''}</p><p>${d.desc||''}</p></div>`;
+    html+=`<div class="card" style="border-left:5px solid ${col}"><span class="badge" style="background:${col}">${(d.type||'meeting').toUpperCase()}</span><small style="float:right">${d.posted||''}</small><h3 style="margin:8px 0">${d.title}</h3><p>📅 ${d.date||''} ⏰ ${d.time||''}</p><p>${d.desc||''}</p></div>`;
   });
   document.getElementById('list').innerHTML=html||'<div class="card">No meetings yet</div>';
-  if(snap.docChanges().length>0 && snap.docChanges()[0].type==='added'){
-    let latest=snap.docChanges()[0].doc.data();
-    if(Notification.permission==='granted' && document.hidden){
-      new Notification('Dooka: '+latest.title,{body:(latest.date||'')+' '+(latest.time||'')+' - '+(latest.desc||'')});
-    }
-  }
 });
 
 onMessage(messaging, (payload)=>{
-  new Notification(payload.notification.title,{body:payload.notification.body});
+  if(Notification.permission==='granted'){
+    new Notification(payload.notification.title,{body:payload.notification.body});
+  }
 });
 </script>
 <style>
 body{margin:0;font-family:sans-serif;background:#fdf8f5}
 .header{background:#7b2c2c;color:white;padding:20px;text-align:center}
-.header img{width:75px;height:75px;border-radius:50%;background:white;padding:4px}
+.header img{width:80px;height:80px;border-radius:50%;background:white;padding:5px;object-fit:contain}
 .card{background:white;margin:12px;padding:15px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
 .btn{background:#7b2c2c;color:white;border:none;padding:14px;border-radius:10px;width:100%;font-weight:bold;font-size:15px}
 .badge{padding:4px 8px;border-radius:6px;color:white;font-size:11px}
