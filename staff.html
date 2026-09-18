@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dooka Staff Updates</title>
+<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiRG9va2EgU3RhZmYiLCJzaG9ydF9uYW1lIjoiRG9va2EiLCJzdGFydF91cmwiOiIuL3N0YWZmLmh0bWwiLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjN2IyYzJjIn0=">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,sans-serif}
+body{background:#f4f1ee}
+.header{background:#7b2c2c;color:white;padding:16px;text-align:center}
+.card{background:white;margin:12px;padding:16px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.btn{background:#7b2c2c;color:white;border:none;padding:12px 18px;border-radius:8px;width:100%;font-weight:bold;cursor:pointer;margin-top:8px}
+input,textarea,select{width:100%;padding:10px;margin:6px 0;border:1px solid #ccc;border-radius:8px}
+.badge{padding:4px 8px;border-radius:6px;font-size:12px;font-weight:bold}
+.urgent{background:#ff3b30;color:white}
+.meeting{background:#007aff;color:white}
+.event{background:#34c759;color:white}
+</style>
+</head>
+<body>
+<div class="header"><h2>🏫 Dooka Primary - Staff Updates</h2><p id="roleText">Teacher View</p></div>
+
+<div id="loginBox" class="card">
+<h3>Principal Login</h3>
+<input id="pin" type="password" placeholder="Enter Principal PIN (Dooka2026)">
+<button class="btn" onclick="login()">Login as Principal</button>
+<hr style="margin:12px 0">
+<button class="btn" style="background:#333" onclick="enableNotify()">🔔 Enable Notifications</button>
+<p style="font-size:12px;margin-top:8px">Teachers: Click Enable Notifications to get meeting alerts!</p>
+</div>
+
+<div id="principalBox" class="card" style="display:none">
+<h3>📢 Post New Update</h3>
+<select id="type"><option value="meeting">📅 Meeting</option><option value="event">🎉 Event</option><option value="urgent">🚨 Urgent</option></select>
+<input id="title" placeholder="Title: e.g. Staff Meeting">
+<input id="date" type="date"><input id="time" type="time">
+<textarea id="desc" placeholder="Details: Venue, Agenda..."></textarea>
+<button class="btn" onclick="postUpdate()">Post & Notify All Teachers</button>
+<button class="btn" style="background:#555" onclick="logout()">Logout</button>
+</div>
+
+<div id="list"></div>
+
+<script>
+// Storage
+let updates = JSON.parse(localStorage.getItem('dooka_staff') || '[]');
+let isPrincipal = false;
+
+function login(){
+ if(document.getElementById('pin').value==='Dooka2026'){
+  isPrincipal=true;
+  document.getElementById('principalBox').style.display='block';
+  document.getElementById('roleText').innerText='Principal Mode';
+  alert('Welcome Principal!');
+ } else alert('Wrong PIN! Use Dooka2026');
+}
+function logout(){isPrincipal=false;document.getElementById('principalBox').style.display='none';document.getElementById('roleText').innerText='Teacher View';}
+
+function postUpdate(){
+ const item={
+  id:Date.now(),
+  type:document.getElementById('type').value,
+  title:document.getElementById('title').value,
+  date:document.getElementById('date').value,
+  time:document.getElementById('time').value,
+  desc:document.getElementById('desc').value,
+  posted: new Date().toLocaleString()
+ };
+ if(!item.title) return alert('Add title!');
+ updates.unshift(item);
+ localStorage.setItem('dooka_staff',JSON.stringify(updates));
+ render();
+ sendNotify(item);
+ scheduleReminder(item);
+ document.getElementById('title').value='';document.getElementById('desc').value='';
+ alert('Posted & Teachers will be notified!');
+}
+
+function render(){
+ let html='';
+ updates.forEach(u=>{
+  let badgeClass = u.type==='urgent'?'urgent':u.type==='meeting'?'meeting':'event';
+  html+=`<div class="card"><span class="badge ${badgeClass}">${u.type.toUpperCase()}</span><span style="float:right;font-size:11px">${u.posted}</span><h3 style="margin:8px 0">${u.title}</h3><p>📅 ${u.date} ⏰ ${u.time}</p><p style="margin-top:6px">${u.desc}</p></div>`;
+ });
+ document.getElementById('list').innerHTML = html || '<div class="card">No updates yet</div>';
+}
+
+// Notifications
+function enableNotify(){
+ Notification.requestPermission().then(p=>{
+  if(p==='granted'){new Notification('Dooka Staff App','Notifications ON - You will get meeting reminders!');alert('Notifications Enabled!');}
+ });
+}
+function sendNotify(item){
+ if(Notification.permission==='granted'){
+  new Notification('Dooka: '+item.title,{body:`${item.type} on ${item.date} at ${item.time}\n${item.desc}`,icon:'logo.png'});
+ }
+ // Play sound
+ let a=new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');a.play().catch(()=>{});
+}
+
+function scheduleReminder(item){
+ if(!item.date || !item.time) return;
+ let dt = new Date(item.date+'T'+item.time);
+ let now = new Date();
+ let diff = dt - now - 3600000; // 1 hour before
+ if(diff>0){
+  setTimeout(()=>{
+   if(Notification.permission==='granted'){
+    new Notification('⏰ Reminder: '+item.title+' in 1 hour',{body:item.desc});
+   }
+  },diff);
+ }
+}
+
+render();
+
+// Auto-check for reminders every minute
+setInterval(()=>{render()},60000);
+</script>
+</body>
+</html>
