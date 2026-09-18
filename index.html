@@ -16,6 +16,7 @@
 .upload-box{border:2px dashed #0a2a4a;padding:12px;border-radius:10px;margin:10px 0;background:#fffbe6}
 .file-status{font-size:12px;font-weight:bold;color:green}
 .preview{max-width:100%;max-height:120px;border-radius:8px;margin-top:5px;display:none}
+.footer{text-align:center;padding:15px;font-size:11px;color:#666;font-weight:bold}
 </style>
 </head>
 <body>
@@ -23,42 +24,46 @@
 <img src="logo.png" class="logo" onerror="this.style.display='none'">
 <h2 style="margin:10px 0 0">DOOKA PRIMARY SCHOOL</h2>
 <p style="color:#ffd700;font-weight:900;margin:5px">THUTO BOTSHELO</p>
-<p style="font-size:11px;color:#a3d3ff">OFFICIAL ONLINE ENROLLMENT 2026 - FREE SYSTEM</p>
+<p style="font-size:11px;color:#a3d3ff">OFFICIAL ONLINE ENROLLMENT 2026</p>
 </div>
+
 <div class="box">
-<h3>👶 Learner</h3>
+<h3>👶 Learner Information</h3>
 <div class="row"><input id="name" class="input" placeholder="Learner Name *"><input id="surname" class="input" placeholder="Surname *"></div>
 <div class="row"><input id="dob" class="input" type="date"><select id="gender" class="input"><option value="">Gender *</option><option>Male</option><option>Female</option></select><select id="grade" class="input"><option value="">Grade *</option><option>Grade R</option><option>Grade 1</option><option>Grade 2</option><option>Grade 3</option><option>Grade 4</option><option>Grade 5</option><option>Grade 6</option><option>Grade 7</option></select></div>
 <textarea id="address" class="input" placeholder="Home Address *"></textarea>
 
-<h3>👨‍👩‍👧 Parent</h3>
+<h3>👨‍👩‍👧 Parent / Guardian</h3>
 <div class="row"><input id="parentName" class="input" placeholder="Parent Full Names *"><select id="relation" class="input"><option value="">Relation *</option><option>Mother</option><option>Father</option><option>Guardian</option></select></div>
 <div class="row"><input id="parentPhone" class="input" placeholder="Phone Number *"><input id="parentID" class="input" placeholder="ID Number"></div>
 
-<h3>📎 Upload Documents - Take Photo with Phone</h3>
+<h3>📎 Upload Documents - Take Photo</h3>
 
 <div class="upload-box">
 <b>1. Child Birth Certificate / Clinic Card *</b><br>
-<input type="file" id="fileBirth" accept="image/*,.pdf" capture="environment" onchange="handleFile(this,'statusBirth','prevBirth')">
+<input type="file" id="fileBirth" accept="image/*" capture="environment" onchange="handleFile(this,'statusBirth','prevBirth')">
 <span id="statusBirth" class="file-status"></span><br><img id="prevBirth" class="preview">
 </div>
 
 <div class="upload-box">
 <b>2. Parent ID Copy *</b><br>
-<input type="file" id="fileParentID" accept="image/*,.pdf" capture="environment" onchange="handleFile(this,'statusParentID','prevParentID')">
+<input type="file" id="fileParentID" accept="image/*" capture="environment" onchange="handleFile(this,'statusParentID','prevParentID')">
 <span id="statusParentID" class="file-status"></span><br><img id="prevParentID" class="preview">
 </div>
 
 <div class="upload-box">
 <b>3. Proof of Residence *</b><br>
-<input type="file" id="fileProof" accept="image/*,.pdf" capture="environment" onchange="handleFile(this,'statusProof','prevProof')">
+<input type="file" id="fileProof" accept="image/*" capture="environment" onchange="handleFile(this,'statusProof','prevProof')">
 <span id="statusProof" class="file-status"></span><br><img id="prevProof" class="preview">
 </div>
 
-<textarea id="notes" class="input" placeholder="Health / Notes"></textarea>
-<button id="btnSubmit" class="btn" onclick="submitEnroll()">📨 SUBMIT WITH DOCUMENTS</button>
+<textarea id="notes" class="input" placeholder="Health / Allergies / Notes"></textarea>
+<button id="btnSubmit" class="btn" onclick="submitEnroll()">📨 SUBMIT ENROLLMENT</button>
 <p id="status" style="text-align:center;font-size:13px;margin-top:12px;color:#0a2a4a;font-weight:bold"></p>
-<div style="text-align:center;margin-top:12px"><a href="admin.html" style="font-size:11px">Admin →</a></div>
+</div>
+
+<div class="footer">
+© 2026 Dooka Primary School - Bushbuckridge<br>Contact: School Office
 </div>
 
 <script>
@@ -71,16 +76,12 @@ function handleFile(input,statusId,previewId){
  document.getElementById(statusId).innerText='⏳ Compressing '+file.name+'...';
  let reader=new FileReader();
  reader.onload=function(e){
-  if(file.type.startsWith('image/')){
-   compressImage(e.target.result, function(compressed){
-    docsData[statusId.includes('Birth')?'birth':statusId.includes('Parent')?'parentID':'proof']=compressed;
-    document.getElementById(statusId).innerText='✅ Ready: '+(compressed.length/1024).toFixed(0)+' KB';
-    let prev=document.getElementById(previewId); prev.src=compressed; prev.style.display='block';
-   });
-  } else {
-   docsData[statusId.includes('Birth')?'birth':statusId.includes('Parent')?'parentID':'proof']=e.target.result;
-   document.getElementById(statusId).innerText='✅ Ready: '+file.name;
-  }
+  compressImage(e.target.result, function(compressed){
+   let key=statusId.includes('Birth')?'birth':statusId.includes('Parent')?'parentID':'proof';
+   docsData[key]=compressed;
+   document.getElementById(statusId).innerText='✅ Ready: '+(compressed.length/1024).toFixed(0)+' KB';
+   let prev=document.getElementById(previewId); prev.src=compressed; prev.style.display='block';
+  });
  };
  reader.readAsDataURL(file);
 }
@@ -95,16 +96,19 @@ function compressImage(dataUrl, callback){
 }
 async function submitEnroll(){
  let n=document.getElementById('name').value.trim(), s=document.getElementById('surname').value.trim(), g=document.getElementById('grade').value, ge=document.getElementById('gender').value, a=document.getElementById('address').value.trim(), pn=document.getElementById('parentName').value.trim(), r=document.getElementById('relation').value, pp=document.getElementById('parentPhone').value.trim();
- if(!n||!s||!g||!ge||!a||!pn||!r||!pp){alert('Fill all * fields');return}
+ if(!n||!s||!g||!ge||!a||!pn||!r||!pp){alert('Please fill all * fields');return}
  if(!docsData.birth||!docsData.parentID||!docsData.proof){alert('Please upload all 3 documents - take photo with phone');return}
- let btn=document.getElementById('btnSubmit');btn.disabled=true;btn.innerText='Saving...'; document.getElementById('status').innerText='Saving to school...';
+ let btn=document.getElementById('btnSubmit');btn.disabled=true;btn.innerText='Saving...'; document.getElementById('status').innerText='Saving to school... Please wait';
  try{
   let adm='DP'+Date.now().toString().slice(-6);
   let data={Date:new Date().toLocaleString(),Timestamp:Date.now(),AdmissionNo:adm,Name:n,Surname:s,FullName:n+' '+s,DOB:document.getElementById('dob').value,Gender:ge,Grade:g,Address:a,ParentName:pn,Relation:r,ParentPhone:pp,ParentID:document.getElementById('parentID').value,BirthCertFile:docsData.birth,ParentIDFile:docsData.parentID,ProofFile:docsData.proof,Notes:document.getElementById('notes').value,Status:'Pending'};
   await db.collection('enrollments').add(data);
   document.getElementById('status').innerText='✅ SUCCESS! Admission No: '+adm;
-  alert('✅ Enrolled! No: '+adm); location.reload();
- }catch(e){document.getElementById('status').innerText='❌ '+e.message; btn.disabled=false; btn.innerText='📨 SUBMIT WITH DOCUMENTS'; alert('Error: '+e.message+'\nCheck Firestore Rules is allow read, write: if true');}
+  alert('✅ Enrolled Successfully!\nAdmission No: '+adm+'\nSchool will contact you.'); location.reload();
+ }catch(e){
+  document.getElementById('status').innerText='❌ '+e.message; btn.disabled=false; btn.innerText='📨 SUBMIT ENROLLMENT';
+  alert('Error: '+e.message+'\n\nGo to Firebase Console > Firestore Database > Rules > Change to allow read, write: if true > Publish');
+ }
 }
 </script>
 </body>
