@@ -2,10 +2,10 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dooka Principal</title>
+<title>Dooka Principal - Year 2026</title>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-import { getFirestore, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBqV9Py9CW9tFMjcYGvucYELmDm3PFUcVQ",
@@ -18,66 +18,91 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-window.login=()=>{
- if(document.getElementById('pin').value==='600100319'){
-  document.getElementById('loginBox').style.display='none';
-  document.getElementById('postBox').style.display='block';
- }else alert('Wrong PIN');
+window.addEvent = async (t,d,ti,ty,desc) => {
+  const title = t || document.getElementById('title').value.trim();
+  const date = d || document.getElementById('date').value;
+  const time = ti || document.getElementById('time').value;
+  const type = ty || document.getElementById('type').value;
+  const de = desc || document.getElementById('desc').value.trim();
+  if(!title ||!date) return alert('Enter Title & Date');
+  await addDoc(collection(db, "updates"), {title, date, time, type:ty||type, desc:de, posted:new Date().toLocaleString(), created:Date.now()});
+  if(!t) { alert('✅ Added'); document.getElementById('title').value=''; document.getElementById('desc').value=''; }
 }
-window.postCloud=async()=>{
- let data={
-  type:document.getElementById('type').value,
-  title:document.getElementById('title').value,
-  date:document.getElementById('date').value,
-  time:document.getElementById('time').value,
-  desc:document.getElementById('desc').value,
-  posted:new Date().toLocaleString(),
-  created:serverTimestamp()
- };
- if(!data.title) return alert('Add title');
- await addDoc(collection(db,'updates'), data);
- alert('✅ Posted to Cloud! All teachers get it instantly');
- document.getElementById('title').value='';document.getElementById('desc').value='';
-}
-window.deletePost=async(id)=>{ if(confirm('Delete?')) await deleteDoc(doc(db,'updates',id)); }
 
-const q=query(collection(db,'updates'), orderBy('created','desc'));
-onSnapshot(q, snap=>{
- let h=''; snap.forEach(d=>{
-  let v=d.data();
-  h+=`<div class="card"><b>${v.type?.toUpperCase()}</b> - ${v.posted}<h3>${v.title}</h3><p>${v.date} ${v.time}</p><p>${v.desc}</p><button onclick="deletePost('${d.id}')" style="color:red;background:none;border:none">Delete</button></div>`;
- });
- document.getElementById('list').innerHTML=h;
+window.fillYear = async () => {
+  if(!confirm('Add 24 Dooka meetings for whole 2026?')) return;
+  const plan=[
+    ["Staff Return & Planning","2026-01-12","08:00","meeting","All staff return"],
+    ["Term 1 Starts","2026-01-14","07:30","event","Learners Return"],
+    ["Staff Meeting - Goals","2026-01-16","14:00","meeting","Term 1 targets"],
+    ["Parents Meeting Term 1","2026-02-06","15:00","meeting","Parents orientation"],
+    ["Valentine Fun Day","2026-02-13","10:00","event","Learner activity"],
+    ["Term 1 Tests","2026-03-09","07:30","urgent","Assessment week"],
+    ["Human Rights Day","2026-03-21","00:00","event","Public Holiday"],
+    ["Term 1 Ends","2026-03-27","11:00","event","Closes"],
+    ["Term 2 Starts","2026-04-08","07:30","event","Term 2"],
+    ["Staff Meeting","2026-04-10","14:00","meeting","Winter prep"],
+    ["Freedom Day","2026-04-27","00:00","event","Holiday"],
+    ["Workers Day","2026-05-01","00:00","event","Holiday"],
+    ["Mid-Year Exams","2026-06-08","07:30","urgent","Exams start"],
+    ["Youth Day","2026-06-16","00:00","event","Holiday - 15th special holiday"],
+    ["Term 2 Ends","2026-06-26","11:00","event","Holidays"],
+    ["Term 3 Starts","2026-07-21","07:30","event","Term 3"],
+    ["Womens Day","2026-08-09","00:00","event","Holiday"],
+    ["Heritage Day","2026-09-18","10:00","event","Cultural"],
+    ["Term 3 Ends","2026-09-23","11:00","event","Break"],
+    ["Term 4 Starts","2026-10-06","07:30","urgent","Final term"],
+    ["Staff Year End","2026-11-13","14:00","meeting","Closing plans"],
+    ["Exams End","2026-11-27","11:00","urgent","Finish"],
+    ["Awards Day","2026-12-04","09:00","event","Dooka Awards"],
+    ["School Closes","2026-12-09","11:00","event","Close"]
+  ];
+  for(let p of plan){ await addEvent(p[0],p[1],p[2],p[3],p[4]); await new Promise(r=>setTimeout(r,300)); }
+  alert('🎉 Year Plan Added!');
+}
+window.deleteEvent = async (id) => { if(confirm('Delete?')) await deleteDoc(doc(db,"updates",id)); }
+const q = query(collection(db, "updates"), orderBy("date","asc"));
+onSnapshot(q, (snap)=>{
+  let html=`<h3>📅 2026 Year - ${snap.size} meetings</h3>`;
+  let byMonth={};
+  snap.forEach(d=>{ let data=d.data(); let m=(data.date||'').substring(0,7); if(!byMonth[m]) byMonth[m]=[]; byMonth[m].push({...data,id:d.id}); });
+  Object.keys(byMonth).sort().forEach(month=>{
+    html+=`<div class="month">📆 ${month}</div>`;
+    byMonth[month].forEach(ev=>{ html+=`<div class="item"><span class="badge ${ev.type}">${ev.type}</span> <b>${ev.date} ${ev.time||''}</b> - ${ev.title} <button onclick="deleteEvent('${ev.id}')" style="float:right;border:none;background:none;color:red">🗑️</button><br><small>${ev.desc||''}</small></div>`; });
+  });
+  document.getElementById('yearList').innerHTML=html||'No meetings - Click green button!';
 });
 </script>
 <style>
 body{margin:0;font-family:sans-serif;background:#fdf8f5}
 .header{background:#7b2c2c;color:white;padding:20px;text-align:center}
-.header img{width:75px;height:75px;border-radius:50%;background:white;padding:4px}
-.card{background:white;margin:12px;padding:15px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
-.btn{background:#7b2c2c;color:white;border:none;padding:14px;border-radius:10px;width:100%;font-weight:bold}
-input,select,textarea{width:100%;padding:11px;margin:6px 0;border:1px solid #ccc;border-radius:8px}
+.header img{width:90px;height:90px;border-radius:50%;background:white;padding:6px;object-fit:contain;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.card{background:white;margin:10px;padding:14px;border-radius:12px;box-shadow:0 2px 6px rgba(0,0,0,.1)}
+input,select,textarea{width:100%;padding:12px;margin:6px 0;border:1px solid #ccc;border-radius:8px;box-sizing:border-box}
+.btn{background:#7b2c2c;color:white;border:none;padding:14px;width:100%;border-radius:10px;font-weight:bold;margin-top:6px}
+.btn-green{background:#2e7d32}
+.month{background:#7b2c2c;color:white;padding:8px 12px;border-radius:8px;margin:12px 0 6px 0}
+.item{background:#fff;padding:10px;border-left:4px solid #7b2c2c;margin:6px 0;border-radius:6px}
+.badge{padding:3px 7px;border-radius:5px;color:white;font-size:10px}
+.badge.meeting{background:#007aff}.badge.urgent{background:#d00}.badge.event{background:#2e7d32}
 </style>
 </head>
 <body>
 <div class="header">
-<img src="logo.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2602/2602414.png'">
-<h2>Dooka Primary</h2>
-<p>Principal - Cloud Panel</p>
+<img src="logo.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2602/2602414.png'" alt="Dooka Logo">
+<h2>DOOKA PRIMARY</h2>
+<p>Principal Year Planner 2026</p>
 </div>
-<div class="card" id="loginBox">
-<h3>🔐 Principal Login</h3>
-<input id="pin" type="password" placeholder="PIN = Dooka2026">
-<button class="btn" onclick="login()">Login</button>
+<div class="card" style="background:#e8f5e9;border:2px solid #2e7d32;text-align:center">
+<h3>⚡ One-Click Year Setup</h3>
+<button class="btn btn-green" onclick="fillYear()">⚡ Fill 2026 Year Plan (24 meetings)</button>
 </div>
-<div class="card" id="postBox" style="display:none">
-<h3>📢 Post Meeting</h3>
-<select id="type"><option>meeting</option><option>event</option><option>urgent</option></select>
-<input id="title" placeholder="Title">
-<input id="date" type="date"><input id="time" type="time">
-<textarea id="desc" placeholder="Details"></textarea>
-<button class="btn" onclick="postCloud()">Post & Push to All Teachers</button>
+<div class="card" style="border:2px solid #7b2c2c">
+<h3>➕ Add Custom Meeting</h3>
+<select id="type"><option value="meeting">📋 Meeting</option><option value="urgent">🚨 Urgent</option><option value="event">🎉 Event</option></select>
+<input id="title" placeholder="Title"><input id="date" type="date"><input id="time" type="time"><textarea id="desc" placeholder="Details"></textarea>
+<button class="btn" onclick="addEvent()">📌 POST TO TEACHERS</button>
 </div>
-<div id="list"></div>
+<div class="card" id="yearList">Loading year plan...</div>
 </body>
 </html>
