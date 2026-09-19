@@ -1,1 +1,52 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Principal Planner</title>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<style>body{margin:0;background:#fdf8f5;font-family:Arial} .top{background:#7b2c2c;color:white;padding:15px;text-align:center} .card{background:white;margin:10px;padding:12px;border-radius:10px;box-shadow:0 1px 3px #999} input,select,textarea{width:100%;padding:10px;margin:4px 0;border:1px solid #ccc;border-radius:8px;box-sizing:border-box} button.main{background:#2e7d32;color:white;width:100%;padding:12px;border:0;border-radius:10px;font-weight:bold}</style>
+</head><body>
+<div class="top"><h3 style="margin:0">Principal Year Planner 2026</h3><div id="cnt">0 meetings</div></div>
+<div class="card">
+<input id="title" placeholder="Meeting Title - e.g. Staff Meeting">
+<input id="date" type="date">
+<input id="time" type="time">
+<select id="type"><option value="meeting">Meeting</option><option value="urgent">Urgent Notice</option><option value="exam">Exam</option><option value="event">Event</option></select>
+<textarea id="desc" placeholder="Description"></textarea>
+<button class="main" onclick="addM()">ADD TO CLOUD</button>
+</div>
+<div id="list"></div>
 
+<script>
+const firebaseConfig={apiKey:"AIzaSyBqV9Py9CW9tFMjcYGvucYELmDm3PFUcVQ",authDomain:"dooka-staff.firebaseapp.com",projectId:"dooka-staff",storageBucket:"dooka-staff.firebasestorage.app",messagingSenderId:"143844824656",appId:"1:143844824656:web:31d9edfeccddb1d8d32355"};
+firebase.initializeApp(firebaseConfig); 
+const db=firebase.firestore();
+
+function addM(){
+  let t=document.getElementById('title').value;
+  let d=document.getElementById('date').value;
+  if(!t||!d) return alert("Title & Date required!");
+  db.collection("updates").add({
+    title:t,
+    date:d,
+    time:document.getElementById('time').value,
+    type:document.getElementById('type').value,
+    desc:document.getElementById('desc').value,
+    created:Date.now()
+  }).then(()=>{
+    alert("Added to Cloud! Teachers will see NOW!");
+    document.getElementById('title').value="";
+  });
+}
+
+db.collection("updates").orderBy("date","asc").onSnapshot(s=>{
+  document.getElementById('cnt').innerText=s.size+" meetings";
+  let h=""; 
+  s.forEach(doc=>{
+    let m=doc.data();
+    h+=`<div class=card><b>${m.date} ${m.time||""}</b> - ${m.title} 
+    <button onclick="if(confirm('Delete this? Teachers will NOT see it anymore.'))db.collection('updates').doc('${doc.id}').delete()" style="float:right;background:#d00;color:white;border:0;padding:5px 10px;border-radius:6px">DELETE</button>
+    <br><small>Type: ${m.type}</small><p>${m.desc||""}</p></div>`
+  }); 
+  document.getElementById('list').innerHTML=h||"<div class=card>No meetings</div>";
+});
+</script>
+</body></html>
