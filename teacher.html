@@ -1,12 +1,118 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dooka Teachers</title>
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+<meta name="color-scheme" content="light">
+<title>Dooka Primary - Teacher App 2026</title>
 
+<!-- OLD FIREBASE = No black screen on your phones -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: #fdf8f5 !important;
+  color: #222;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.header {
+  background: #7b2c2c;
+  color: white;
+  padding: 20px;
+  text-align: center;
+  border-bottom: 5px solid #d4af37;
+}
+.header img {
+  width: 90px;
+  height: 90px;
+  background: white;
+  border-radius: 50%;
+  padding: 6px;
+  object-fit: contain;
+}
+.countBar {
+  background: #2e7d32;
+  color: white;
+  padding: 12px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 16px;
+}
+.tabFuture {
+  background: #e8f5e9;
+  color: #2e7d32;
+  padding: 10px;
+  text-align: center;
+  font-weight: bold;
+  border-left: 5px solid #2e7d32;
+  margin: 10px 10px 0 10px;
+}
+.card {
+  background: white;
+  margin: 10px;
+  padding: 14px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  border-left: 6px solid #7b2c2c;
+}
+.badge {
+  padding: 3px 8px;
+  border-radius: 5px;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  float: right;
+}
+.footer {
+  background: #7b2c2c;
+  color: #d4af37;
+  text-align: center;
+  padding: 15px;
+  margin-top: 20px;
+  font-size: 12px;
+}
+.pastToggle {
+  background: #eeeeee;
+  color: #666;
+  text-align: center;
+  padding: 10px;
+  margin: 15px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px dashed #999;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <img src="logo.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2602/2602414.png'" alt="Logo">
+  <h2 style="margin:10px 0 0 0">DOOKA PRIMARY SCHOOL</h2>
+  <div style="color:#d4af37;font-weight:bold;margin:5px 0">THUTO BOTSHELO</div>
+  <small>Teacher Updates - Complete Package 2026</small>
+</div>
+
+<div class="countBar" id="cnt">Connecting to cloud...</div>
+
+<div class="tabFuture">📅 UPCOMING MEETINGS - TERM 1 to TERM 4</div>
+
+<div id="list">
+  <div class="card">Loading meetings from cloud...<br><small>Please wait, checking dooka-staff firebase</small></div>
+</div>
+
+<div id="pastBtn"></div>
+<div id="pastList" style="display:none"></div>
+
+<div class="footer">
+  Contact school office for more information<br>
+  2026 Academic Year | Grades R-7
+</div>
+
+<script>
+// FIREBASE CONFIG - YOUR dooka-staff project
 const firebaseConfig = {
   apiKey: "AIzaSyBqV9Py9CW9tFMjcYGvucYELmDm3PFUcVQ",
   authDomain: "dooka-staff.firebaseapp.com",
@@ -16,50 +122,80 @@ const firebaseConfig = {
   appId: "1:143844824656:web:31d9edfeccddb1d8d32355"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-const q = query(collection(db, "updates"), orderBy("date","asc"));
-let first=true;
-onSnapshot(q, (snap)=>{
-  let html='';
-  let today = new Date().toISOString().substring(0,10);
-  snap.forEach(doc=>{
-    let d=doc.data();
-    let col=d.type==='urgent'?'#d00':d.type==='meeting'?'#007aff':'#2e7d32';
-    let isPast = d.date < today ? 'opacity:0.5' : '';
-    html+=`<div class="card" style="border-left:5px solid ${col};${isPast}"><span class="badge" style="background:${col}">${(d.type||'meeting').toUpperCase()}</span><small style="float:right">${d.date||''}</small><h3 style="margin:8px 0">${d.title}</h3><p>⏰ ${d.time||''}</p><p>${d.desc||''}</p></div>`;
+// GET TODAY DATE - e.g. 2026-05-13
+const todayStr = new Date().toISOString().slice(0,10);
+
+db.collection("updates").orderBy("date","asc").onSnapshot((snap)=>{
+  let futureHtml = "";
+  let pastHtml = "";
+  let futureCount = 0;
+  let pastCount = 0;
+
+  snap.forEach((doc)=>{
+    let m = doc.data();
+    if(!m.date) return;
+
+    // COLOR BY TYPE
+    let color = "#7b2c2c";
+    if(m.type=="urgent") color="#d00";
+    if(m.type=="meeting") color="#0d47a1";
+    if(m.type=="exam") color="#ef6c00";
+    if(m.type=="event") color="#2e7d32";
+
+    let isPast = m.date < todayStr;
+    let cardHtml = `<div class="card" style="border-left-color:${color}">
+      <span class="badge" style="background:${color}">${m.type ? m.type.toUpperCase() : 'MEETING'}</span>
+      <b>📅 ${m.date} ${m.time || ""}</b>
+      <h3 style="margin:8px 0 5px 0;color:#7b2c2c">${m.title}</h3>
+      <p style="margin:5px 0;color:#444">${m.desc || ""}</p>
+    </div>`;
+
+    if(isPast){
+      pastHtml += cardHtml;
+      pastCount++;
+    } else {
+      futureHtml += cardHtml;
+      futureCount++;
+    }
   });
-  document.getElementById('list').innerHTML=html||'<div class="card">No meetings yet</div>';
-  document.getElementById('count').innerText=snap.size+' meetings in 2026';
-  if(!first && snap.docChanges().some(c=>c.type==='added')){
-    try{ navigator.vibrate && navigator.vibrate(500); }catch(e){}
-    let audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
-    audio.play().catch(()=>{});
+
+  // UPDATE COUNT
+  document.getElementById("cnt").innerText = futureCount + " upcoming meetings | " + pastCount + " past hidden";
+
+  // SHOW ONLY FUTURE - THIS FIXES YOUR REQUEST
+  if(futureHtml==""){
+    document.getElementById("list").innerHTML = `<div class="card" style="border-left-color:#2e7d32"><h3>No upcoming meetings</h3><p>Principal will add Term 1-4 meetings soon. Check again later.</p></div>`;
+  } else {
+    document.getElementById("list").innerHTML = futureHtml;
   }
-  first=false;
+
+  // PAST MEETINGS BUTTON - HIDDEN BY DEFAULT
+  if(pastCount>0){
+    document.getElementById("pastBtn").innerHTML = `<div class="pastToggle" onclick="document.getElementById('pastList').style.display='block'; this.style.display='none'">👁️ Show ${pastCount} past meetings that are hidden ▼</div>`;
+    document.getElementById("pastList").innerHTML = `<div class="tabFuture" style="background:#f5f5f5;color:#888;border-left-color:#888">PAST MEETINGS - Hidden</div>` + pastHtml;
+  } else {
+    document.getElementById("pastBtn").innerHTML = "";
+    document.getElementById("pastList").innerHTML = "";
+  }
+
+}, (error)=>{
+  // ERROR - FIREBASE RULES BLOCKED
+  document.getElementById("cnt").innerText = "Cloud Error";
+  document.getElementById("list").innerHTML = `<div class="card" style="border-left-color:red;color:red">
+    <b>⚠️ Firebase Error:</b> ${error.message}<br><br>
+    <b>FIX:</b><br>
+    1. Go to firebase.google.com<br>
+    2. Open dooka-staff project<br>
+    3. Firestore Database > Rules<br>
+    4. Change to:<br>
+    <code style="background:#ffe6e6;padding:5px;display:block;margin:5px 0">allow read, write: if true;</code>
+    5. Click Publish<br>
+  </div>`;
 });
 </script>
-<style>
-body{margin:0;font-family:sans-serif;background:#fdf8f5}
-.header{background:#7b2c2c;color:white;padding:20px;text-align:center}
-.header img{width:80px;height:80px;border-radius:50%;background:white;padding:5px;object-fit:contain}
-.card{background:white;margin:10px;padding:14px;border-radius:12px;box-shadow:0 2px 6px rgba(0,0,0,.1)}
-.badge{padding:4px 8px;border-radius:6px;color:white;font-size:11px}
-.countBar{background:#2e7d32;color:white;text-align:center;padding:10px;font-weight:bold}
-</style>
-</head>
-<body>
-<div class="header">
-<img src="logo.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2602/2602414.png'">
-<h2>Dooka Primary School</h2>
-<p>Teacher Updates 2026</p>
-</div>
-<div class="countBar" id="count">Loading year plan...</div>
-<div class="card" style="text-align:center;background:#fff8f0">
-<h3>👋 Dumela Teacher</h3>
-<p style="font-size:13px">You will see all meetings for whole year below.<br>When Principal posts new meeting, it appears instantly!</p>
-</div>
-<div id="list"><div class="card">Loading cloud updates...</div></div>
+
 </body>
 </html>
