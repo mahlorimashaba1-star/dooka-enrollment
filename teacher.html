@@ -6,7 +6,6 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-messaging.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBqV9Py9CW9tFMjcYGvucYELmDm3PFUcVQ",
@@ -19,75 +18,47 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const messaging = getMessaging(app);
-const VAPID_KEY = "BIOkrx7Xuj4CFlcCuvEZj0hmGcxeCbxvY_qWZh2FfgiHUcqOz8CNt2fovCTpwaAJxk7DJLmt79CiYgeNkIzZiyI";
 
-window.enableCloud = async () => {
-  try{
-    const permission = await Notification.requestPermission();
-    if(permission!== 'granted') return alert('Please Allow Notifications');
-    
-    // FIX: Register SW from current folder, not root
-    const registration = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
-    console.log('SW registered', registration);
-    await navigator.serviceWorker.ready;
-    
-    const token = await getToken(messaging, {vapidKey: VAPID_KEY, serviceWorkerRegistration: registration});
-    console.log('FCM Token:', token);
-    localStorage.setItem('fcm_token', token);
-    alert('✅ Cloud Notifications ON! Token saved');
-    if(Notification.permission==='granted') new Notification('Dooka Teachers', {body:'✅ Notifications ON!'});
-  }catch(e){ 
-    console.error(e);
-    // If still error, fallback to just Firestore realtime (still works!)
-    alert('⚠️ Push blocked by GitHub, but Firestore alerts still work! You will get meetings when app is open. Error: '+e.message); 
-  }
-}
-
-const q = query(collection(db, "updates"), orderBy("created","desc"));
-let firstLoad = true;
+const q = query(collection(db, "updates"), orderBy("date","asc"));
+let first=true;
 onSnapshot(q, (snap)=>{
   let html='';
+  let today = new Date().toISOString().substring(0,10);
   snap.forEach(doc=>{
     let d=doc.data();
     let col=d.type==='urgent'?'#d00':d.type==='meeting'?'#007aff':'#2e7d32';
-    html+=`<div class="card" style="border-left:5px solid ${col}"><span class="badge" style="background:${col}">${(d.type||'meeting').toUpperCase()}</span><small style="float:right">${d.posted||''}</small><h3 style="margin:8px 0">${d.title}</h3><p>📅 ${d.date||''} ⏰ ${d.time||''}</p><p>${d.desc||''}</p></div>`;
+    let isPast = d.date < today ? 'opacity:0.5' : '';
+    html+=`<div class="card" style="border-left:5px solid ${col};${isPast}"><span class="badge" style="background:${col}">${(d.type||'meeting').toUpperCase()}</span><small style="float:right">${d.date||''}</small><h3 style="margin:8px 0">${d.title}</h3><p>⏰ ${d.time||''}</p><p>${d.desc||''}</p></div>`;
   });
   document.getElementById('list').innerHTML=html||'<div class="card">No meetings yet</div>';
-  
-  // Auto pop when new meeting added
-  if(!firstLoad && snap.docChanges().some(c=>c.type==='added')){
-    let latest = snap.docChanges().find(c=>c.type==='added')?.doc.data();
-    if(latest && Notification.permission==='granted'){
-      new Notification('Dooka: '+latest.title, {body: latest.desc, icon:'logo.png'});
-    }
+  document.getElementById('count').innerText=snap.size+' meetings in 2026';
+  if(!first && snap.docChanges().some(c=>c.type==='added')){
+    try{ navigator.vibrate && navigator.vibrate(500); }catch(e){}
+    let audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+    audio.play().catch(()=>{});
   }
-  firstLoad=false;
-});
-
-onMessage(messaging, (payload)=>{
-  new Notification(payload.notification.title,{body:payload.notification.body, icon:'logo.png'});
+  first=false;
 });
 </script>
 <style>
 body{margin:0;font-family:sans-serif;background:#fdf8f5}
 .header{background:#7b2c2c;color:white;padding:20px;text-align:center}
-.header img{width:80px;height:80px;border-radius:50%;background:white;padding:5px}
-.card{background:white;margin:12px;padding:15px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
-.btn{background:#7b2c2c;color:white;border:none;padding:14px;border-radius:10px;width:100%;font-weight:bold}
+.header img{width:80px;height:80px;border-radius:50%;background:white;padding:5px;object-fit:contain}
+.card{background:white;margin:10px;padding:14px;border-radius:12px;box-shadow:0 2px 6px rgba(0,0,0,.1)}
 .badge{padding:4px 8px;border-radius:6px;color:white;font-size:11px}
+.countBar{background:#2e7d32;color:white;text-align:center;padding:10px;font-weight:bold}
 </style>
 </head>
 <body>
 <div class="header">
 <img src="logo.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2602/2602414.png'">
 <h2>Dooka Primary School</h2>
-<p>Teacher Updates</p>
+<p>Teacher Updates 2026</p>
 </div>
+<div class="countBar" id="count">Loading year plan...</div>
 <div class="card" style="text-align:center;background:#fff8f0">
 <h3>👋 Dumela Teacher</h3>
-<button class="btn" onclick="enableCloud()">🔔 Enable Cloud Notifications</button>
-<p style="font-size:11px">Click once. Even if GitHub blocks push, you WILL get alerts when app is open via cloud!</p>
+<p style="font-size:13px">You will see all meetings for whole year below.<br>When Principal posts new meeting, it appears instantly!</p>
 </div>
 <div id="list"><div class="card">Loading cloud updates...</div></div>
 </body>
