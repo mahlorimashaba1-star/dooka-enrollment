@@ -1,110 +1,91 @@
 <!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dooka ADMIN - Locked</title>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<title>Dooka SUPER ADMIN - Final Linked</title>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <style>
 body{margin:0;background:#fdf8f5;font-family:Arial}
-.top{background:#7b2c2c;color:white;padding:15px;text-align:center;border-bottom:5px solid #d4af37}
-.tabs{display:flex;background:#333}.tabs button{flex:1;padding:14px;border:0;color:white;font-weight:bold;cursor:pointer}.tabs button.active{background:#2e7d32}
+.top{background:#800000;color:white;padding:12px;text-align:center;border-bottom:5px solid #ffd700;position:sticky;top:0;z-index:50}
+.tabs{display:flex;background:#222;position:sticky;top:68px;z-index:100}
+.tabs button{flex:1;padding:12px 2px;border:0;color:white;font-weight:bold;font-size:11px;cursor:pointer}
+.tabs button.active{background:green}
 .tabContent{display:none}.tabContent.active{display:block}
-.card{background:white;margin:10px;padding:12px;border-radius:10px;box-shadow:0 2px 4px #999}
-input,select,textarea{width:100%;padding:10px;margin:4px 0;border:1px solid #ccc;border-radius:8px;box-sizing:border-box}
-.btn{width:100%;padding:12px;border:0;border-radius:10px;font-weight:bold;color:white;cursor:pointer;margin-top:6px}
-.btnGreen{background:#2e7d32}.btnBlue{background:#0d47a1}.btnGold{background:#d4af37;color:#7b2c2c;border:2px solid #7b2c2c}
-/* PASSWORD LOCK SCREEN */
-#lockScreen{position:fixed;top:0;left:0;width:100%;height:100%;background:#7b2c2c;display:flex;align-items:center;justify-content:center;z-index:9999}
-.lockBox{background:white;padding:25px;border-radius:15px;width:90%;max-width:350px;text-align:center;box-shadow:0 10px 20px rgba(0,0,0,0.5)}
-.lockBox h2{color:#7b2c2c}.lockBox input{font-size:18px;text-align:center;letter-spacing:2px}
+.card{background:white;margin:8px;padding:10px;border-radius:10px;box-shadow:0 2px 4px #999}
+.btn{width:100%;padding:11px;border:0;border-radius:10px;font-weight:bold;color:white;cursor:pointer;margin-top:5px}
+.btnGreen{background:green}.btnGold{background:#ffd700;color:#800000;border:2px solid #800000}.btnRed{background:#d00}.btnOrange{background:orange}
+#lockScreen{position:fixed;top:0;left:0;width:100%;height:100%;background:#800000;display:flex;align-items:center;justify-content:center;z-index:9999}
+.lockBox{background:white;padding:25px;border-radius:15px;width:90%;max-width:350px;text-align:center}
+.docImg{max-width:100%;max-height:200px;border-radius:8px;border:2px solid #800000;margin:5px 0;display:block}
+.badge{padding:2px 7px;border-radius:10px;color:white;font-size:10px}
 </style>
 </head><body>
 
-<!-- PASSWORD SCREEN -->
-<div id="lockScreen">
-<div class="lockBox">
-<h2>🔒 DOOKA ADMIN</h2><p style="color:#666">Principal Access Only</p>
-<input id="pwd" type="password" placeholder="Enter Password">
-<button class="btn btnGreen" onclick="checkPwd()">UNLOCK</button>
-<small id="pwdErr" style="color:red;display:none">Wrong password! Call developer.</small>
-<p style="margin-top:10px;font-size:11px;color:#888">Default: Dooka2026!</p>
-</div>
-</div>
+<div id="lockScreen"><div class="lockBox"><h2 style="color:#800000;margin:0">🔒 DOOKA ADMIN</h2><p>Principal Only</p><input id="pwd" type="password" placeholder="Enter Password" style="width:100%;padding:12px;border:2px solid #800000;border-radius:8px;text-align:center;font-size:16px"><button class="btn btnGreen" onclick="checkPwd()">UNLOCK</button><small id="pwdErr" style="color:red;display:none">Wrong password!</small><br><small style="color:#888">Default: Dooka2026!</small><br><button onclick="localStorage.clear();location.reload()" style="margin-top:10px;font-size:10px;background:none;border:0;color:#888">Forgot? Logout</button></div></div>
 
-<div class="top"><h2 style="margin:0">DOOKA SUPER ADMIN</h2><small>Meetings + SA-SAMS Export</small><div id="cnt">...</div></div>
+<div class="top"><h2 style="margin:0">DOOKA PRIMARY - SUPER ADMIN</h2><small id="cnt">Loading...</small></div>
 <div class="tabs">
-<button id="tabBtn1" class="active" onclick="showTab('meetings')">📅 MEETINGS</button>
-<button id="tabBtn2" onclick="showTab('learners')">🎓 SA-SAMS</button>
+<button id="b1" class="active" onclick="showTab('apps')">👨‍👩‍👧 PENDING <span id="appCount" style="background:red;padding:2px 6px;border-radius:10px">0</span></button>
+<button id="b2" onclick="showTab('approved')">✅ APPROVED <span id="approvedCount" style="background:green;padding:2px 6px;border-radius:10px">0</span></button>
+<button id="b3" onclick="showTab('sams')">🎓 SA-SAMS EXPORT</button>
 </div>
 
-<div id="meetings" class="tabContent active">
-<div class="card"><h3 style="margin:0;color:#7b2c2c">Add Meeting</h3>
-<input id="mTitle" placeholder="Title"><input id="mDate" type="date"><input id="mTime" type="time">
-<select id="mType"><option value="meeting">Meeting</option><option value="urgent">Urgent</option><option value="exam">Exam</option><option value="event">Event</option></select>
-<textarea id="mDesc" placeholder="Description"></textarea>
-<button class="btn btnGreen" onclick="addMeeting()">ADD - Teachers see instantly</button>
-</div><div id="mList"></div>
-</div>
-
-<div id="learners" class="tabContent">
-<div class="card"><h3 style="margin:0;color:#7b2c2c">Add Learner - SA-SAMS</h3>
-<input id="surname" placeholder="Surname *"><input id="firstname" placeholder="First Names *">
-<input id="idno" placeholder="ID 13 digits"><input id="dob" type="date">
-<select id="gender"><option value="">Gender *</option><option value="M">M</option><option value="F">F</option></select>
-<select id="race"><option value="">Race *</option><option value="B">B</option><option value="W">W</option><option value="C">C</option><option value="I">I</option></select>
-<select id="lang"><option value="">Language *</option><option value="Z">Z - Zulu</option><option value="X">X - Xhosa</option><option value="S">S - Sotho</option><option value="P">P - Sepedi</option><option value="E">E - English</option></select>
-<select id="grade"><option value="">Grade *</option><option>R</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option></select>
-<input id="class" placeholder="Class 4A"><input id="parentName" placeholder="Parent Name"><input id="parentCell" placeholder="Parent Cell"><input id="address" placeholder="Address">
-<button class="btn btnGreen" onclick="addLearner()">SAVE LEARNER</button>
-<button class="btn btnGold" onclick="exportCSV('sams')">⭐ EXPORT FOR SA-SAMS / LURITS</button>
-</div><div id="lList"></div>
+<div id="apps" class="tabContent active"><div id="appList"></div></div>
+<div id="approved" class="tabContent"><div id="approvedList"></div></div>
+<div id="sams" class="tabContent">
+<div class="card" style="border:3px solid #ffd700;background:#fffbe6"><h3 style="margin:0;color:#800000">⭐ SA-SAMS / LURITS EXPORT</h3><p style="font-size:12px;line-height:1.4">This exports <b>ONLY Approved learners</b> with all SA-SAMS required fields:<br>✅ Surname, Names, Learner ID, DOB YYYY/MM/DD, Gender M/F, Race B/W/C/I, Home Language Z/X/S/P/E etc, Grade, Parent Cell, Address, Admission No</p>
+<button class="btn btnGold" onclick="exportSAMS()">⭐ EXPORT APPROVED FOR SA-SAMS / LURITS</button>
+<button class="btn btnGreen" onclick="exportSAMSAll()">Export ALL (Approved + Pending) - Backup</button>
+</div><div id="samsList"></div>
 </div>
 
 <script>
-// === CHANGE YOUR PASSWORD HERE ===
-const ADMIN_PASSWORD = "Dooka2026!"; // <-- Change this to your secret!
+const ADMIN_PASSWORD="Dooka2026!"; // CHANGE YOUR PASSWORD HERE
+function checkPwd(){if(document.getElementById('pwd').value===ADMIN_PASSWORD){localStorage.setItem('dooka_admin_ok','yes');document.getElementById('lockScreen').style.display='none';}else{document.getElementById('pwdErr').style.display='block';}}
+if(localStorage.getItem('dooka_admin_ok')==='yes')document.getElementById('lockScreen').style.display='none';
+function showTab(t){document.querySelectorAll('.tabContent').forEach(c=>c.classList.remove('active'));document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));document.getElementById(t).classList.add('active');document.getElementById(t=='apps'?'b1':t=='approved'?'b2':'b3').classList.add('active');}
 
-function checkPwd(){
- if(document.getElementById('pwd').value === ADMIN_PASSWORD){
-  localStorage.setItem('dooka_admin_ok','yes');
-  document.getElementById('lockScreen').style.display='none';
- } else {
-  document.getElementById('pwdErr').style.display='block';
- }
-}
-if(localStorage.getItem('dooka_admin_ok')==='yes'){document.getElementById('lockScreen').style.display='none';}
-
-function showTab(t){
- document.querySelectorAll('.tabContent').forEach(c=>c.classList.remove('active'));
- document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));
- document.getElementById(t).classList.add('active');
- document.getElementById(t=='meetings'?'tabBtn1':'tabBtn2').classList.add('active');
-}
-const firebaseConfig={apiKey:"AIzaSyBqV9Py9CW9tFMjcYGvucYELmDm3PFUcVQ",authDomain:"dooka-staff.firebaseapp.com",projectId:"dooka-staff",storageBucket:"dooka-staff.firebasestorage.app",messagingSenderId:"143844824656",appId:"1:143844824656:web:31d9edfeccddb1d8d32355"};
+const firebaseConfig={apiKey:"AIzaSyCVm-xNEv4IwZ5pk79YFOLOMapnAOlUCrM",authDomain:"dooka-enrollment.firebaseapp.com",projectId:"dooka-enrollment",storageBucket:"dooka-enrollment.firebasestorage.app",messagingSenderId:"75187233656",appId:"1:75187233656:web:962e5eba5b15892c295e8d"};
 firebase.initializeApp(firebaseConfig); const db=firebase.firestore();
+let allApproved=[], allPending=[];
 
-function addMeeting(){
- let t=mTitle.value, d=mDate.value; if(!t||!d) return alert("Title & Date required!");
- db.collection("updates").add({title:t,date:d,time:mTime.value,type:mType.value,desc:mDesc.value,created:Date.now()}).then(()=>{alert("Added!"); mTitle.value="";});
-}
-db.collection("updates").orderBy("date","asc").onSnapshot(s=>{
- let h=""; s.forEach(doc=>{let m=doc.data(); h+=`<div class=card><b>${m.date} ${m.time||""}</b> - ${m.title}<br><small>${m.desc||""}</small><button onclick="if(confirm('Delete?'))db.collection('updates').doc('${doc.id}').delete()" style="float:right;background:#d00;color:white;border:0;padding:5px 10px;border-radius:6px">DELETE</button></div>`;});
- document.getElementById('mList').innerHTML=h; updateCnt();
+db.collection("enrollments").orderBy("Timestamp","desc").onSnapshot(snap=>{
+ let pendingHtml="", approvedHtml="", samsPreview=""; allApproved=[]; allPending=[]; let pendCount=0, apprCount=0;
+ snap.forEach(doc=>{
+  let a=doc.data(); let id=doc.id;
+  if(a.Status=="Pending" ||!a.Status || a.Status=="pending"){
+   pendCount++; allPending.push({...a, _id:id});
+   pendingHtml+=`<div class=card style="border-left:6px solid orange"><b>🆕 ${a.FullName||a.Name+' '+a.Surname}</b> - <span class=badge style="background:orange">PENDING</span><br><b>Adm:</b> ${a.AdmissionNo} | <b>Grade:</b> ${a.Grade}<br><small><b>DOB:</b> ${a.DOB||""} | <b>Gender:</b> ${a.Gender} | <b>ID:</b> ${a.LearnerID||"No ID"}<br><b>Race:</b> ${a.Race||""} | <b>Lang:</b> ${a.HomeLanguage||""}<br><b>Parent:</b> ${a.ParentName} (${a.Relation}) - ${a.ParentPhone}<br><b>Cell2:</b> ${a.ParentPhone2||""} | <b>WhatsApp:</b> ${a.WhatsApp}<br><b>Addr:</b> ${a.Address}<br><b>Notes:</b> ${a.Notes||""}</small><br><br><b>📎 Documents:</b><br>${a.BirthCertFile?`<img src="${a.BirthCertFile}" class=docImg><small>Birth Cert</small>`:"❌ No Birth"}<br>${a.ParentIDFile?`<img src="${a.ParentIDFile}" class=docImg><small>Parent ID</small>`:"❌ No Parent ID"}<br>${a.ProofFile?`<img src="${a.ProofFile}" class=docImg><small>Proof Residence</small>`:"❌ No Proof"}<br><br><button onclick="updateStatus('${id}','Approved')" class=btn btnGreen>✅ APPROVE - Parent sees APPROVED</button><button onclick="updateStatus('${id}','Rejected')" class=btn btnRed>❌ REJECT</button></div>`;
+  } else if(a.Status=="Approved"){
+   apprCount++; allApproved.push({...a, _id:id});
+   approvedHtml+=`<div class=card style="border-left:6px solid green"><b>✅ ${a.FullName}</b> - ${a.Grade} - ${a.AdmissionNo} <span class=badge style="background:green">APPROVED</span><br><small>Race:${a.Race} Lang:${a.HomeLanguage} ID:${a.LearnerID}<br>Parent:${a.ParentName} ${a.ParentPhone}<br>DOB:${a.DOB} Gender:${a.Gender}</small><br><button onclick="updateStatus('${id}','Pending')" style="background:orange;color:white;border:0;padding:5px 10px;border-radius:5px;margin-top:5px">↩ Move to Pending</button> <button onclick="if(confirm('Delete?'))db.collection('enrollments').doc('${id}').delete()" style="background:#d00;color:white;border:0;padding:5px 10px;border-radius:5px">Delete</button></div>`;
+   samsPreview+=`<div class=card><b>${a.Surname} ${a.Name}</b> - Gr ${(a.Grade||"").replace("Grade ","")} | ${a.Race}/${a.HomeLanguage} | ID:${a.LearnerID||""}<br><small>${a.AdmissionNo}</small></div>`;
+  }
+ });
+ document.getElementById('appCount').innerText=pendCount; document.getElementById('approvedCount').innerText=apprCount;
+ document.getElementById('appList').innerHTML=pendingHtml||"<div class=card>No pending applications - All caught up!</div>";
+ document.getElementById('approvedList').innerHTML=approvedHtml||"<div class=card>No approved learners yet. Approve pending apps first.</div>";
+ document.getElementById('samsList').innerHTML=samsPreview;
+ document.getElementById('cnt').innerText=pendCount+" pending | "+apprCount+" approved | Ready for SA-SAMS";
 });
 
-let allLearners=[];
-function addLearner(){
- let s=surname.value.trim(), f=firstname.value.trim(); if(!s||!f) return alert("Surname & Names required!");
- db.collection("learners").add({surname:s,firstname:f,idno:idno.value,dob:dob.value,gender:gender.value,race:race.value,lang:lang.value,grade:grade.value,class:document.getElementById('class').value,parentName:parentName.value,parentCell:parentCell.value,address:address.value,created:Date.now()}).then(()=>{alert("Saved!"); surname.value=""; firstname.value="";});
+function updateStatus(id,status){db.collection("enrollments").doc(id).update({Status:status}).then(()=>{alert("✅ Status changed to "+status+"! Parent can see it when they CHECK STATUS on their phone.");});}
+
+function exportSAMS(){
+ if(allApproved.length==0)return alert("No APPROVED learners! Approve some first in PENDING tab.");
+ let csv="Surname,First Names,Learner ID,Birth Certificate No,Date of Birth,Gender,Race,Home Language,Grade,Class,Parent Name,Parent ID,Parent Cell,WhatsApp,Parent Phone2,Address,Admission No,Status,Notes\n";
+ allApproved.forEach(a=>{
+  let gradeOnly=(a.Grade||"").replace("Grade ","").trim();
+  let genderCode=(a.Gender||"").toLowerCase().includes("f")?"F":"M";
+  let dobF=(a.DOB||"").split("-").join("/"); // SA-SAMS wants YYYY/MM/DD
+  csv+=`"${(a.Surname||"").replace(/"/g,'') }","${(a.Name||"").replace(/"/g,'')}","${a.LearnerID||""}","${a.LearnerID||""}","${dobF}","${genderCode}","${a.Race||""}","${a.HomeLanguage||""}","${gradeOnly}","","${(a.ParentName||"").replace(/"/g,'')}","${a.ParentID||""}","${a.ParentPhone||""}","${a.WhatsApp||""}","${a.ParentPhone2||""}","${(a.Address||"").replace(/"/g,'')}","${a.AdmissionNo||""}","ENROLLED","${(a.Notes||"").replace(/"/g,'')}"\n`;
+ });
+ let blob=new Blob([csv],{type:"text/csv;charset=utf-8;"});let aa=document.createElement("a");aa.href=URL.createObjectURL(blob);aa.download="Dooka_APPROVED_SA-SAMS_LURITS_"+new Date().toISOString().slice(0,10)+".csv";aa.click();
+ alert("✅ SA-SAMS CSV Downloaded: "+allApproved.length+" learners\n\nNow go to SA-SAMS computer:\n1. Open SA-SAMS\n2. Go to Learner > Import Learners\n3. Select this CSV\n4. Import & Save!");
 }
-db.collection("learners").orderBy("surname").onSnapshot(snap=>{
- allLearners=[]; let html=""; snap.forEach(d=>{let l=d.data(); allLearners.push(l); html+=`<div class=card><b>${l.surname} ${l.firstname}</b> - ${l.grade||""}${l.class||""}<button onclick="db.collection('learners').doc('${d.id}').delete()" style="float:right;background:#d00;color:white;border:0;padding:4px 8px;border-radius:5px">X</button></div>`;});
- document.getElementById('lList').innerHTML=html; updateCnt();
-});
-function updateCnt(){ document.getElementById('cnt').innerText=(document.getElementById('mList').children.length||0)+" meetings | "+allLearners.length+" learners"; }
-function exportCSV(type){
- if(allLearners.length==0) return alert("No learners!");
- let csv="Surname,First Names,ID Number,Date of Birth,Gender,M,F,Race,Home Language,Grade,Class,Parent Name,Parent Cell,Address,CEMIS No,Admission No,Status\n";
- allLearners.forEach(l=>{ let dobF=l.dob?l.dob.split("-").join("/"): ""; let m=l.gender=="M"?"M":""; let f=l.gender=="F"?"F":""; csv+=`"${l.surname}","${l.firstname}","${l.idno}","${dobF}","${l.gender}","${m}","${f}","${l.race}","${l.lang}","${l.grade}","${l.class}","${l.parentName}","${l.parentCell}","${l.address}","","","ENROLLED"\n`; });
- let blob=new Blob([csv],{type:"text/csv"}); let a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="Dooka_SA-SAMS_LURITS.csv"; a.click();
+function exportSAMSAll(){
+ let all=[...allPending,...allApproved]; if(all.length==0)return alert("No data!");
+ let csv="Surname,First Names,Learner ID,Date of Birth,Gender,Race,Home Language,Grade,Parent Cell,Admission No,Status\n";
+ all.forEach(a=>{let gradeOnly=(a.Grade||"").replace("Grade ","").trim();let genderCode=(a.Gender||"").toLowerCase().includes("f")?"F":"M";let dobF=(a.DOB||"").split("-").join("/");csv+=`"${a.Surname}","${a.Name}","${a.LearnerID}","${dobF}","${genderCode}","${a.Race}","${a.HomeLanguage}","${gradeOnly}","${a.ParentPhone}","${a.AdmissionNo}","${a.Status}"\n`;});
+ let blob=new Blob([csv],{type:"text/csv"});let aa=document.createElement("a");aa.href=URL.createObjectURL(blob);aa.download="Dooka_ALL_Backup.csv";aa.click();
 }
 </script>
 </body></html>
