@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dooka Primary - Enrollment 2027</title>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -16,42 +14,31 @@
 .btn{width:100%;padding:16px;border:none;border-radius:12px;font-weight:900;font-size:18px;cursor:pointer;background:#800000;color:#ffd700}
 .btn-green{background:green;color:white}
 .upload-box{border:2px dashed #800000;padding:12px;border-radius:10px;margin:10px 0;background:#fff8e1}
-.file-status{font-size:12px;font-weight:bold;color:green}
-.preview{max-width:100%;max-height:120px;border-radius:8px;margin-top:5px;display:none}
+.file-status{font-size:12px;font-weight:bold;color:green}.preview{max-width:100%;max-height:120px;border-radius:8px;margin-top:5px;display:none}
 .status-box{border:3px solid #800000;border-radius:12px;padding:15px;margin-top:15px;background:#fffbe6;display:none}
-.status-approved{border-color:green;background:#e8ffe8}
-.status-pending{border-color:orange;background:#fff3e0}
-.status-rejected{border-color:red;background:#ffe0e0}
+.status-approved{border-color:green;background:#e8ffe8}.status-pending{border-color:orange;background:#fff3e0}.status-rejected{border-color:red;background:#ffe0e0}
 .footer{text-align:center;padding:15px;font-size:11px;color:#666;font-weight:bold}
-</style>
-</head>
-<body>
-<div class="header">
-<img src="logo.png" class="logo" onerror="this.style.display='none'">
-<h2 style="margin:10px 0 0">DOOKA PRIMARY SCHOOL</h2>
-<p style="color:#ffd700;font-weight:900;margin:5px">THUTO BOTSHELO</p>
-<p style="font-size:11px;color:#ffcccc">OFFICIAL ONLINE ENROLLMENT 2026</p>
-</div>
+</style></head><body>
+<div class="header"><img src="logo.png" class="logo" onerror="this.style.display='none'"><h2 style="margin:10px 0 0">DOOKA PRIMARY SCHOOL</h2><p style="color:#ffd700;font-weight:900;margin:5px">THUTO BOTSHELO</p><p style="font-size:11px;color:#ffcccc">OFFICIAL ONLINE ENROLLMENT 2026 - SA-SAMS READY</p></div>
 
 <div class="box">
-<div class="section-title">👶 LEARNER INFORMATION</div>
+<div class="section-title">👶 LEARNER INFORMATION - SA-SAMS REQUIRED</div>
 <div class="row"><input id="name" class="input" placeholder="Learner Name *"><input id="surname" class="input" placeholder="Surname *"></div>
-<div class="row"><input id="dob" class="input" type="date"><select id="gender" class="input"><option value="">Gender *</option><option>Male</option><option>Female</option></select><select id="grade" class="input"><option value="">Grade *</option><option>Grade R</option><option>Grade 1</option><option>Grade 2</option><option>Grade 3</option><option>Grade 4</option><option>Grade 5</option><option>Grade 6</option><option>Grade 7</option></select></div>
-<textarea id="address" class="input" placeholder="Home Address *"></textarea>
+<div class="row"><input id="dob" class="input" type="date"><select id="gender" class="input"><option value="">Gender *</option><option>Male</option><option>Female</option></select></div>
+<div class="row"><input id="learnerID" class="input" placeholder="Learner ID / Birth Cert No (13 digits)"><select id="race" class="input"><option value="">Race * - SA-SAMS</option><option value="B">B - Black</option><option value="W">W - White</option><option value="C">C - Coloured</option><option value="I">I - Indian</option><option value="O">O - Other</option></select></div>
+<div class="row"><select id="homeLang" class="input"><option value="">Home Language * - SA-SAMS</option><option value="Z">Z - IsiZulu</option><option value="X">X - IsiXhosa</option><option value="S">S - Sesotho</option><option value="P">P - Sepedi (Northern Sotho)</option><option value="T">T - Xitsonga</option><option value="V">V - Tshivenda</option><option value="W">W - Setswana</option><option value="N">N - IsiNdebele</option><option value="I">I - Siswati</option><option value="E">E - English</option><option value="A">A - Afrikaans</option><option value="O">O - Other</option></select><select id="grade" class="input"><option value="">Grade *</option><option>Grade R</option><option>Grade 1</option><option>Grade 2</option><option>Grade 3</option><option>Grade 4</option><option>Grade 5</option><option>Grade 6</option><option>Grade 7</option></select></div>
+<textarea id="address" class="input" placeholder="Home Address * - Required for SA-SAMS"></textarea>
 
 <div class="section-title">👨‍👩‍👧 PARENT / GUARDIAN - PRIMARY</div>
 <div class="row"><input id="parentName" class="input" placeholder="Parent Full Names *"><select id="relation" class="input"><option value="">Relation *</option><option>Mother</option><option>Father</option><option>Guardian</option><option>Grandparent</option></select></div>
-<div class="row"><input id="parentID" class="input" placeholder="ID Number *"><input id="parentOccupation" class="input" placeholder="Occupation"></div>
+<div class="row"><input id="parentID" class="input" placeholder="Parent ID Number *"><input id="parentOccupation" class="input" placeholder="Occupation"></div>
 
-<div class="section-title">📞 PARENTS CONTACT SECTION</div>
+<div class="section-title">📞 CONTACT - Required for SA-SAMS</div>
 <div class="row"><input id="parentPhone" class="input" placeholder="Cellphone Number 1 * (Calls)" type="tel"><input id="parentPhone2" class="input" placeholder="Cellphone Number 2 (Alternative)" type="tel"></div>
 <div class="row"><input id="whatsapp" class="input" placeholder="WhatsApp Number *" type="tel"><input id="email" class="input" placeholder="Email (if any)" type="email"></div>
 <div class="row"><input id="emergencyName" class="input" placeholder="Emergency Contact Name"><input id="emergencyPhone" class="input" placeholder="Emergency Phone" type="tel"></div>
 
-<div class="section-title">👪 SECOND PARENT (Optional)</div>
-<div class="row"><input id="parent2Name" class="input" placeholder="Second Parent Name"><input id="parent2Phone" class="input" placeholder="Second Parent Phone" type="tel"></div>
-
-<div class="section-title">📎 UPLOAD DOCUMENTS</div>
+<div class="section-title">📎 UPLOAD DOCUMENTS - LURITS needs these</div>
 <div class="upload-box"><b>1. Child Birth Certificate / Clinic Card *</b><br><input type="file" id="fileBirth" accept="image/*" capture="environment" onchange="handleFile(this,'statusBirth','prevBirth')"><span id="statusBirth" class="file-status"></span><br><img id="prevBirth" class="preview"></div>
 <div class="upload-box"><b>2. Parent ID Copy *</b><br><input type="file" id="fileParentID" accept="image/*" capture="environment" onchange="handleFile(this,'statusParentID','prevParentID')"><span id="statusParentID" class="file-status"></span><br><img id="prevParentID" class="preview"></div>
 <div class="upload-box"><b>3. Proof of Residence *</b><br><input type="file" id="fileProof" accept="image/*" capture="environment" onchange="handleFile(this,'statusProof','prevProof')"><span id="statusProof" class="file-status"></span><br><img id="prevProof" class="preview"></div>
@@ -61,76 +48,31 @@
 <p id="status" style="text-align:center;font-size:13px;margin-top:12px;color:#800000;font-weight:bold"></p>
 </div>
 
-<!-- NEW STATUS CHECKER -->
-<div class="box" style="border-color:green">
-<div class="section-title" style="background:green">🔍 CHECK APPLICATION STATUS</div>
-<p style="font-size:13px;font-weight:bold">Enter your Cellphone Number or Admission No to check status:</p>
-<div class="row"><input id="checkInput" class="input" placeholder="Enter Phone or Admission No (e.g. DP123456)"><button class="btn btn-green" onclick="checkStatus()" style="max-width:140px">CHECK STATUS</button></div>
-<div id="statusResult" class="status-box"></div>
-</div>
+<div class="box" style="border-color:green"><div class="section-title" style="background:green">🔍 CHECK APPLICATION STATUS</div><p style="font-size:13px;font-weight:bold">Enter Cellphone or Admission No:</p><div class="row"><input id="checkInput" class="input" placeholder="e.g. DP123456"><button class="btn btn-green" onclick="checkStatus()" style="max-width:140px">CHECK</button></div><div id="statusResult" class="status-box"></div></div>
 
-<div class="footer">© 2027 Dooka Primary School - BOSPLAAS</div>
+<div class="footer">© 2027 Dooka Primary - BOSPLAAS - SA-SAMS Ready</div>
 
 <script>
 const firebaseConfig={apiKey:"AIzaSyCVm-xNEv4IwZ5pk79YFOLOMapnAOlUCrM",authDomain:"dooka-enrollment.firebaseapp.com",projectId:"dooka-enrollment",storageBucket:"dooka-enrollment.firebasestorage.app",messagingSenderId:"75187233656",appId:"1:75187233656:web:962e5eba5b15892c295e8d"};
 firebase.initializeApp(firebaseConfig);const db=firebase.firestore();
 let docsData={birth:null,parentID:null,proof:null};
-
-function handleFile(input,statusId,previewId){
- let file=input.files[0]; if(!file) return;
- document.getElementById(statusId).innerText='⏳ Compressing...';
- let reader=new FileReader();
- reader.onload=function(e){
-  compressImage(e.target.result, function(compressed){
-   let key=statusId.includes('Birth')?'birth':statusId.includes('Parent')?'parentID':'proof';
-   docsData[key]=compressed;
-   document.getElementById(statusId).innerText='✅ Ready: '+(compressed.length/1024).toFixed(0)+' KB';
-   let prev=document.getElementById(previewId); prev.src=compressed; prev.style.display='block';
-  });
- }; reader.readAsDataURL(file);
-}
-function compressImage(dataUrl, callback){
- let img=new Image(); img.onload=function(){
-  let canvas=document.createElement('canvas'); let maxW=800;
-  let scale=maxW/img.width; if(scale>1) scale=1;
-  canvas.width=img.width*scale; canvas.height=img.height*scale;
-  let ctx=canvas.getContext('2d'); ctx.drawImage(img,0,0,canvas.width,canvas.height);
-  callback(canvas.toDataURL('image/jpeg',0.6));
- }; img.src=dataUrl;
-}
+function handleFile(input,statusId,previewId){let file=input.files[0];if(!file)return;document.getElementById(statusId).innerText='⏳ Compressing...';let reader=new FileReader();reader.onload=function(e){compressImage(e.target.result,function(c){let k=statusId.includes('Birth')?'birth':statusId.includes('Parent')?'parentID':'proof';docsData[k]=c;document.getElementById(statusId).innerText='✅ Ready: '+(c.length/1024).toFixed(0)+' KB';let p=document.getElementById(previewId);p.src=c;p.style.display='block';});};reader.readAsDataURL(file);}
+function compressImage(dataUrl,cb){let img=new Image();img.onload=function(){let cv=document.createElement('canvas');let maxW=800;let sc=maxW/img.width;if(sc>1)sc=1;cv.width=img.width*sc;cv.height=img.height*sc;let ctx=cv.getContext('2d');ctx.drawImage(img,0,0,cv.width,cv.height);cb(cv.toDataURL('image/jpeg',0.6));};img.src=dataUrl;}
 async function submitEnroll(){
- let n=document.getElementById('name').value.trim(), s=document.getElementById('surname').value.trim(), g=document.getElementById('grade').value, ge=document.getElementById('gender').value, a=document.getElementById('address').value.trim(), pn=document.getElementById('parentName').value.trim(), r=document.getElementById('relation').value, pp=document.getElementById('parentPhone').value.trim(), wa=document.getElementById('whatsapp').value.trim();
- if(!n||!s||!g||!ge||!a||!pn||!r||!pp||!wa){alert('Fill all * fields including WhatsApp');return}
- if(!docsData.birth||!docsData.parentID||!docsData.proof){alert('Upload all 3 documents');return}
- let btn=document.getElementById('btnSubmit');btn.disabled=true;btn.innerText='Saving...'; document.getElementById('status').innerText='Saving...';
+ let n=document.getElementById('name').value.trim(), s=document.getElementById('surname').value.trim(), g=document.getElementById('grade').value, ge=document.getElementById('gender').value, a=document.getElementById('address').value.trim(), pn=document.getElementById('parentName').value.trim(), r=document.getElementById('relation').value, pp=document.getElementById('parentPhone').value.trim(), wa=document.getElementById('whatsapp').value.trim(), race=document.getElementById('race').value, lang=document.getElementById('homeLang').value, lid=document.getElementById('learnerID').value.trim();
+ if(!n||!s||!g||!ge||!a||!pn||!r||!pp||!wa||!race||!lang){alert('Fill ALL * fields - Race & Home Language required for SA-SAMS!');return}
+ if(!docsData.birth||!docsData.parentID||!docsData.proof){alert('Upload all 3 documents - Required for LURITS');return}
+ let btn=document.getElementById('btnSubmit');btn.disabled=true;btn.innerText='Saving...';
  try{
   let adm='DP'+Date.now().toString().slice(-6);
-  let data={Date:new Date().toLocaleString(),Timestamp:Date.now(),AdmissionNo:adm,Name:n,Surname:s,FullName:n+' '+s,DOB:document.getElementById('dob').value,Gender:ge,Grade:g,Address:a,ParentName:pn,Relation:r,ParentID:document.getElementById('parentID').value,ParentOccupation:document.getElementById('parentOccupation').value,ParentPhone:pp,ParentPhone2:document.getElementById('parentPhone2').value,WhatsApp:wa,Email:document.getElementById('email').value,EmergencyName:document.getElementById('emergencyName').value,EmergencyPhone:document.getElementById('emergencyPhone').value,Parent2Name:document.getElementById('parent2Name').value,Parent2Phone:document.getElementById('parent2Phone').value,BirthCertFile:docsData.birth,ParentIDFile:docsData.parentID,ProofFile:docsData.proof,Notes:document.getElementById('notes').value,Status:'Pending'};
+  let data={Date:new Date().toLocaleString(),Timestamp:Date.now(),AdmissionNo:adm,Name:n,Surname:s,FullName:n+' '+s,DOB:document.getElementById('dob').value,Gender:ge,Grade:g,LearnerID:lid,Race:race,HomeLanguage:lang,Address:a,ParentName:pn,Relation:r,ParentID:document.getElementById('parentID').value,ParentOccupation:document.getElementById('parentOccupation').value,ParentPhone:pp,ParentPhone2:document.getElementById('parentPhone2').value,WhatsApp:wa,Email:document.getElementById('email').value,EmergencyName:document.getElementById('emergencyName').value,EmergencyPhone:document.getElementById('emergencyPhone').value,BirthCertFile:docsData.birth,ParentIDFile:docsData.parentID,ProofFile:docsData.proof,Notes:document.getElementById('notes').value,Status:'Pending'};
   await db.collection('enrollments').add(data);
-  document.getElementById('status').innerText='✅ SUCCESS! Admission No: '+adm+' - Use this to check status';
-  alert('✅ Enrolled! Admission No: '+adm+'\n\nSave this number to check status later!'); location.reload();
- }catch(e){document.getElementById('status').innerText='❌ '+e.message; btn.disabled=false; btn.innerText='📨 SUBMIT ENROLLMENT'; alert('Error: '+e.message);}
+  document.getElementById('status').innerText='✅ SUCCESS! Admission No: '+adm; alert('✅ Enrolled! Admission No: '+adm+'\nSave this number!'); location.reload();
+ }catch(e){document.getElementById('status').innerText='❌ '+e.message; btn.disabled=false; btn.innerText='📨 SUBMIT ENROLLMENT';}
 }
-
 async function checkStatus(){
- let q=document.getElementById('checkInput').value.trim(); if(!q) return alert('Enter phone or Admission No');
- let resultDiv=document.getElementById('statusResult'); resultDiv.style.display='block'; resultDiv.innerHTML='⏳ Checking...'; resultDiv.className='status-box';
- try{
-  let snap=await db.collection('enrollments').get();
-  let found=null;
-  snap.forEach(doc=>{
-   let d=doc.data();
-   if((d.AdmissionNo&&d.AdmissionNo.toLowerCase()==q.toLowerCase()) || (d.ParentPhone&&d.ParentPhone.includes(q)) || (d.WhatsApp&&d.WhatsApp.includes(q))){
-    found=d;
-   }
-  });
-  if(!found){resultDiv.innerHTML='❌ No application found for: '+q+'<br><small>Check number or call school office</small>'; resultDiv.className='status-box status-rejected'; return;}
-  let colorClass=found.Status=='Approved'?'status-approved':found.Status=='Rejected'?'status-rejected':'status-pending';
-  let icon=found.Status=='Approved'?'✅':found.Status=='Rejected'?'❌':'⏳';
-  resultDiv.className='status-box '+colorClass;
-  resultDiv.innerHTML=`${icon} <b>STATUS: ${found.Status}</b><br><br><b>Learner:</b> ${found.FullName}<br><b>Grade:</b> ${found.Grade}<br><b>Admission No:</b> ${found.AdmissionNo}<br><b>Date:</b> ${found.Date}<br><br>${found.Status=='Approved'?'<b style=\"color:green\">🎉 CONGRATULATIONS! Your child is ACCEPTED! Please visit school with original documents.</b>':found.Status=='Rejected'?'<b style=\"color:red\">Application not successful. Contact office.</b>':'<b style=\"color:orange\">Your application is being reviewed. Please check again later or contact school.</b>'}`;
- }catch(e){resultDiv.innerHTML='❌ Error: '+e.message; resultDiv.className='status-box status-rejected';}
+ let q=document.getElementById('checkInput').value.trim();if(!q)return alert('Enter phone or Admission No');
+ let res=document.getElementById('statusResult');res.style.display='block';res.innerHTML='⏳ Checking...';res.className='status-box';
+ try{let snap=await db.collection('enrollments').get();let found=null;snap.forEach(doc=>{let d=doc.data();if((d.AdmissionNo&&d.AdmissionNo.toLowerCase()==q.toLowerCase())||(d.ParentPhone&&d.ParentPhone.includes(q))||(d.WhatsApp&&d.WhatsApp.includes(q)))found=d;});if(!found){res.innerHTML='❌ No application for: '+q;res.className='status-box status-rejected';return;}let cls=found.Status=='Approved'?'status-approved':found.Status=='Rejected'?'status-rejected':'status-pending';let icon=found.Status=='Approved'?'✅':found.Status=='Rejected'?'❌':'⏳';res.className='status-box '+cls;res.innerHTML=`${icon} <b>STATUS: ${found.Status}</b><br><br><b>Learner:</b> ${found.FullName}<br><b>Grade:</b> ${found.Grade}<br><b>Race:</b> ${found.Race} <b>Lang:</b> ${found.HomeLanguage}<br><b>Admission No:</b> ${found.AdmissionNo}<br><b>Date:</b> ${found.Date}<br><br>${found.Status=='Approved'?'<b style="color:green">🎉 ACCEPTED! Visit school with original documents.</b>':found.Status=='Rejected'?'<b style="color:red">Not successful. Contact office.</b>':'<b style="color:orange">Being reviewed. Check again later.</b>'}`;}catch(e){res.innerHTML='❌ Error: '+e.message;res.className='status-box status-rejected';}
 }
-</script>
-</body>
-</html>
+</script></body></html>
