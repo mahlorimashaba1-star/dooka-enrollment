@@ -1,78 +1,38 @@
 <!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dooka Primary - Enrollment 2027</title>
+<title>Dooka Primary - School Letters</title>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <style>
 *{box-sizing:border-box;font-family:Arial,sans-serif}body{background:#fdf0f0;margin:0}
 .header{background:#800000;color:white;padding:20px;text-align:center}
-.logo{width:110px;height:110px;border-radius:50%;border:4px solid #ffd700;background:white;object-fit:contain}
 .box{background:white;margin:12px;padding:18px;border-radius:14px;border:3px solid #800000}
-.section-title{background:#800000;color:#ffd700;padding:8px 12px;border-radius:8px;margin:18px 0 8px;font-weight:900}
-.input,select,textarea{width:100%;padding:13px;border:2px solid #800000;border-radius:10px;margin:7px 0;font-weight:bold}
-.row{display:flex;gap:8px}.row>*{flex:1}@media(max-width:600px){.row{flex-direction:column}}
-.btn{width:100%;padding:16px;border:none;border-radius:12px;font-weight:900;font-size:18px;cursor:pointer;background:#800000;color:#ffd700}
-.btn-green{background:green;color:white}
-.upload-box{border:2px dashed #800000;padding:12px;border-radius:10px;margin:10px 0;background:#fff8e1}
-.file-status{font-size:12px;font-weight:bold;color:green}.preview{max-width:100%;max-height:120px;border-radius:8px;margin-top:5px;display:none}
-.status-box{border:3px solid #800000;border-radius:12px;padding:15px;margin-top:15px;background:#fffbe6;display:none}
-.status-approved{border-color:green;background:#e8ffe8}.status-pending{border-color:orange;background:#fff3e0}.status-rejected{border-color:red;background:#ffe0e0}
+.letter-card{background:white;border-left:6px solid #800000;padding:14px;margin:12px 0;border-radius:10px;box-shadow:0 2px 5px rgba(0,0,0,0.1)}
 .footer{text-align:center;padding:15px;font-size:11px;color:#666;font-weight:bold}
 </style></head><body>
-<div class="header"><img src="logo.png" class="logo" onerror="this.style.display='none'"><h2 style="margin:10px 0 0">DOOKA PRIMARY SCHOOL</h2><p style="color:#ffd700;font-weight:900;margin:5px">THUTO BOTSHELO</p><p style="font-size:11px;color:#ffcccc">OFFICIAL ONLINE ENROLLMENT 2026 - SA-SAMS READY</p></div>
-
+<div class="header"><h2>DOOKA PRIMARY SCHOOL</h2><p style="color:#ffd700;font-weight:900">THUTO BOTSHELO</p><p style="font-size:12px">OFFICIAL SCHOOL LETTERS FOR PARENTS</p></div>
 <div class="box">
-<div class="section-title">👶 LEARNER INFORMATION - SA-SAMS REQUIRED</div>
-<div class="row"><input id="name" class="input" placeholder="Learner Name *"><input id="surname" class="input" placeholder="Surname *"></div>
-<div class="row"><input id="dob" class="input" type="date"><select id="gender" class="input"><option value="">Gender *</option><option>Male</option><option>Female</option></select></div>
-<div class="row"><input id="learnerID" class="input" placeholder="Learner ID / Birth Cert No (13 digits)"><select id="race" class="input"><option value="">Race * - SA-SAMS</option><option value="B">B - Black</option><option value="W">W - White</option><option value="C">C - Coloured</option><option value="I">I - Indian</option><option value="O">O - Other</option></select></div>
-<div class="row"><select id="homeLang" class="input"><option value="">Home Language * - SA-SAMS</option><option value="Z">Z - IsiZulu</option><option value="X">X - IsiXhosa</option><option value="S">S - Sesotho</option><option value="P">P - Sepedi (Northern Sotho)</option><option value="T">T - Xitsonga</option><option value="V">V - Tshivenda</option><option value="W">W - Setswana</option><option value="N">N - IsiNdebele</option><option value="I">I - Siswati</option><option value="E">E - English</option><option value="A">A - Afrikaans</option><option value="O">O - Other</option></select><select id="grade" class="input"><option value="">Grade *</option><option>Grade R</option><option>Grade 1</option><option>Grade 2</option><option>Grade 3</option><option>Grade 4</option><option>Grade 5</option><option>Grade 6</option><option>Grade 7</option></select></div>
-<textarea id="address" class="input" placeholder="Home Address * - Required for SA-SAMS"></textarea>
-
-<div class="section-title">👨‍👩‍👧 PARENT / GUARDIAN - PRIMARY</div>
-<div class="row"><input id="parentName" class="input" placeholder="Parent Full Names *"><select id="relation" class="input"><option value="">Relation *</option><option>Mother</option><option>Father</option><option>Guardian</option><option>Grandparent</option></select></div>
-<div class="row"><input id="parentID" class="input" placeholder="Parent ID Number *"><input id="parentOccupation" class="input" placeholder="Occupation"></div>
-
-<div class="section-title">📞 CONTACT - Required for SA-SAMS</div>
-<div class="row"><input id="parentPhone" class="input" placeholder="Cellphone Number 1 * (Calls)" type="tel"><input id="parentPhone2" class="input" placeholder="Cellphone Number 2 (Alternative)" type="tel"></div>
-<div class="row"><input id="whatsapp" class="input" placeholder="WhatsApp Number *" type="tel"><input id="email" class="input" placeholder="Email (if any)" type="email"></div>
-<div class="row"><input id="emergencyName" class="input" placeholder="Emergency Contact Name"><input id="emergencyPhone" class="input" placeholder="Emergency Phone" type="tel"></div>
-
-<div class="section-title">📎 UPLOAD DOCUMENTS - LURITS needs these</div>
-<div class="upload-box"><b>1. Child Birth Certificate / Clinic Card *</b><br><input type="file" id="fileBirth" accept="image/*" capture="environment" onchange="handleFile(this,'statusBirth','prevBirth')"><span id="statusBirth" class="file-status"></span><br><img id="prevBirth" class="preview"></div>
-<div class="upload-box"><b>2. Parent ID Copy *</b><br><input type="file" id="fileParentID" accept="image/*" capture="environment" onchange="handleFile(this,'statusParentID','prevParentID')"><span id="statusParentID" class="file-status"></span><br><img id="prevParentID" class="preview"></div>
-<div class="upload-box"><b>3. Proof of Residence *</b><br><input type="file" id="fileProof" accept="image/*" capture="environment" onchange="handleFile(this,'statusProof','prevProof')"><span id="statusProof" class="file-status"></span><br><img id="prevProof" class="preview"></div>
-
-<textarea id="notes" class="input" placeholder="Health / Allergies / Special Notes"></textarea>
-<button id="btnSubmit" class="btn" onclick="submitEnroll()">📨 SUBMIT ENROLLMENT</button>
-<p id="status" style="text-align:center;font-size:13px;margin-top:12px;color:#800000;font-weight:bold"></p>
+<h2 style="color:#800000;margin:0">✉️ Latest Letters</h2>
+<p style="font-size:13px;color:#666;font-weight:bold">All official updates from school. Pull down to refresh.</p>
+<div id="lettersList">⏳ Loading letters...</div>
 </div>
-
-<div class="box" style="border-color:green"><div class="section-title" style="background:green">🔍 CHECK APPLICATION STATUS</div><p style="font-size:13px;font-weight:bold">Enter Cellphone or Admission No:</p><div class="row"><input id="checkInput" class="input" placeholder="e.g. DP123456"><button class="btn btn-green" onclick="checkStatus()" style="max-width:140px">CHECK</button></div><div id="statusResult" class="status-box"></div></div>
-
-<div class="footer">© 2027 Dooka Primary - BOSPLAAS - SA-SAMS Ready</div>
-
+<div class="footer">© 2027 Dooka Primary - Bosplaas</div>
 <script>
 const firebaseConfig={apiKey:"AIzaSyCVm-xNEv4IwZ5pk79YFOLOMapnAOlUCrM",authDomain:"dooka-enrollment.firebaseapp.com",projectId:"dooka-enrollment",storageBucket:"dooka-enrollment.firebasestorage.app",messagingSenderId:"75187233656",appId:"1:75187233656:web:962e5eba5b15892c295e8d"};
 firebase.initializeApp(firebaseConfig);const db=firebase.firestore();
-let docsData={birth:null,parentID:null,proof:null};
-function handleFile(input,statusId,previewId){let file=input.files[0];if(!file)return;document.getElementById(statusId).innerText='⏳ Compressing...';let reader=new FileReader();reader.onload=function(e){compressImage(e.target.result,function(c){let k=statusId.includes('Birth')?'birth':statusId.includes('Parent')?'parentID':'proof';docsData[k]=c;document.getElementById(statusId).innerText='✅ Ready: '+(c.length/1024).toFixed(0)+' KB';let p=document.getElementById(previewId);p.src=c;p.style.display='block';});};reader.readAsDataURL(file);}
-function compressImage(dataUrl,cb){let img=new Image();img.onload=function(){let cv=document.createElement('canvas');let maxW=800;let sc=maxW/img.width;if(sc>1)sc=1;cv.width=img.width*sc;cv.height=img.height*sc;let ctx=cv.getContext('2d');ctx.drawImage(img,0,0,cv.width,cv.height);cb(cv.toDataURL('image/jpeg',0.6));};img.src=dataUrl;}
-async function submitEnroll(){
- let n=document.getElementById('name').value.trim(), s=document.getElementById('surname').value.trim(), g=document.getElementById('grade').value, ge=document.getElementById('gender').value, a=document.getElementById('address').value.trim(), pn=document.getElementById('parentName').value.trim(), r=document.getElementById('relation').value, pp=document.getElementById('parentPhone').value.trim(), wa=document.getElementById('whatsapp').value.trim(), race=document.getElementById('race').value, lang=document.getElementById('homeLang').value, lid=document.getElementById('learnerID').value.trim();
- if(!n||!s||!g||!ge||!a||!pn||!r||!pp||!wa||!race||!lang){alert('Fill ALL * fields - Race & Home Language required for SA-SAMS!');return}
- if(!docsData.birth||!docsData.parentID||!docsData.proof){alert('Upload all 3 documents - Required for LURITS');return}
- let btn=document.getElementById('btnSubmit');btn.disabled=true;btn.innerText='Saving...';
+async function loadLetters(){
+ let list=document.getElementById('lettersList');
  try{
-  let adm='DP'+Date.now().toString().slice(-6);
-  let data={Date:new Date().toLocaleString(),Timestamp:Date.now(),AdmissionNo:adm,Name:n,Surname:s,FullName:n+' '+s,DOB:document.getElementById('dob').value,Gender:ge,Grade:g,LearnerID:lid,Race:race,HomeLanguage:lang,Address:a,ParentName:pn,Relation:r,ParentID:document.getElementById('parentID').value,ParentOccupation:document.getElementById('parentOccupation').value,ParentPhone:pp,ParentPhone2:document.getElementById('parentPhone2').value,WhatsApp:wa,Email:document.getElementById('email').value,EmergencyName:document.getElementById('emergencyName').value,EmergencyPhone:document.getElementById('emergencyPhone').value,BirthCertFile:docsData.birth,ParentIDFile:docsData.parentID,ProofFile:docsData.proof,Notes:document.getElementById('notes').value,Status:'Pending'};
-  await db.collection('enrollments').add(data);
-  document.getElementById('status').innerText='✅ SUCCESS! Admission No: '+adm; alert('✅ Enrolled! Admission No: '+adm+'\nSave this number!'); location.reload();
- }catch(e){document.getElementById('status').innerText='❌ '+e.message; btn.disabled=false; btn.innerText='📨 SUBMIT ENROLLMENT';}
+  let snap=await db.collection('letters').orderBy('Timestamp','desc').get();
+  if(snap.empty){list.innerHTML='<p>No letters yet. School will publish soon.</p>';return;}
+  let html='';
+  snap.forEach(doc=>{
+   let d=doc.data();
+   html+=`<div class="letter-card"><div style="font-size:11px;color:#888">📅 ${d.Date} | ${d.GradeTarget}</div><div style="font-weight:900;color:#800000;margin:5px 0;font-size:16px">${d.Title}</div><div style="line-height:1.6;white-space:pre-wrap">${d.Body}</div></div>`;
+  });
+  list.innerHTML=html;
+ }catch(e){list.innerHTML='❌ Error: '+e.message;}
 }
-async function checkStatus(){
- let q=document.getElementById('checkInput').value.trim();if(!q)return alert('Enter phone or Admission No');
- let res=document.getElementById('statusResult');res.style.display='block';res.innerHTML='⏳ Checking...';res.className='status-box';
- try{let snap=await db.collection('enrollments').get();let found=null;snap.forEach(doc=>{let d=doc.data();if((d.AdmissionNo&&d.AdmissionNo.toLowerCase()==q.toLowerCase())||(d.ParentPhone&&d.ParentPhone.includes(q))||(d.WhatsApp&&d.WhatsApp.includes(q)))found=d;});if(!found){res.innerHTML='❌ No application for: '+q;res.className='status-box status-rejected';return;}let cls=found.Status=='Approved'?'status-approved':found.Status=='Rejected'?'status-rejected':'status-pending';let icon=found.Status=='Approved'?'✅':found.Status=='Rejected'?'❌':'⏳';res.className='status-box '+cls;res.innerHTML=`${icon} <b>STATUS: ${found.Status}</b><br><br><b>Learner:</b> ${found.FullName}<br><b>Grade:</b> ${found.Grade}<br><b>Race:</b> ${found.Race} <b>Lang:</b> ${found.HomeLanguage}<br><b>Admission No:</b> ${found.AdmissionNo}<br><b>Date:</b> ${found.Date}<br><br>${found.Status=='Approved'?'<b style="color:green">🎉 ACCEPTED! Visit school with original documents.</b>':found.Status=='Rejected'?'<b style="color:red">Not successful. Contact office.</b>':'<b style="color:orange">Being reviewed. Check again later.</b>'}`;}catch(e){res.innerHTML='❌ Error: '+e.message;res.className='status-box status-rejected';}
-}
+loadLetters();
+setInterval(loadLetters, 30000);
 </script></body></html>
