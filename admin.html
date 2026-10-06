@@ -2,6 +2,7 @@
 <title>Dooka ADMIN </title>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 <style>
 body{margin:0;background:#fdf8f5;font-family:Arial}
 .top{background:#800000;color:white;padding:12px;text-align:center;border-bottom:5px solid #ffd700;position:sticky;top:0;z-index:50}
@@ -46,6 +47,14 @@ body{margin:0;background:#fdf8f5;font-family:Arial}
 <p style="font-size:11px;color:#800000">This will appear instantly on parents site under SCHOOL LETTERS tab</p>
 <input id="letTitle" class="input" placeholder="Letter Title * e.g. Parents Meeting 15 Oct 2026">
 <textarea id="letBody" class="input" rows="5" placeholder="Write full letter message here... *"></textarea>
+
+<div style="background:white;padding:10px;border-radius:8px;border:2px dashed #800000;margin:8px 0">
+<label style="font-weight:900;color:#800000;font-size:12px">📎 Attach PDF Letter (Optional):</label>
+<input id="letFile" type="file" accept=".pdf" style="width:100%;margin-top:6px">
+<small id="fileName" style="color:green;font-size:11px;font-weight:bold"></small>
+<small style="display:block;color:#666;font-size:10px;margin-top:3px">Max 10MB. Only PDF allowed.</small>
+</div>
+
 <div style="display:flex;gap:6px"><input id="letDate" class="input" type="date" style="flex:1"><select id="letGrade" class="input" style="flex:1"><option>All Grades</option><option>Grade R</option><option>Grade 1</option><option>Grade 2</option><option>Grade 3</option><option>Grade 4</option><option>Grade 5</option><option>Grade 6</option><option>Grade 7</option></select></div>
 <button class="btn btnBlue" onclick="publishLetter()">📢 PUBLISH LETTER TO ALL PARENTS</button>
 <p id="letStatus" style="text-align:center;font-weight:bold;font-size:12px"></p>
@@ -98,20 +107,37 @@ function exportSAMSAll(){
  all.forEach(a=>{let gradeOnly=(a.Grade||"").replace("Grade ","").trim();let genderCode=(a.Gender||"").toLowerCase().includes("f")?"F":"M";let dobF=(a.DOB||"").split("-").join("/");csv+=`"${a.Surname}","${a.Name}","${a.LearnerID}","${dobF}","${genderCode}","${a.Race}","${a.HomeLanguage}","${gradeOnly}","${a.ParentPhone}","${a.AdmissionNo}","${a.Status}"\n`;});
  let blob=new Blob([csv],{type:"text/csv"});let aa=document.createElement("a");aa.href=URL.createObjectURL(blob);aa.download="Dooka_ALL_Backup.csv";aa.click();
 }
+
+// LETTERS WITH PDF
 async function publishLetter(){
  let t=document.getElementById('letTitle').value.trim();
  let b=document.getElementById('letBody').value.trim();
  let d=document.getElementById('letDate').value || new Date().toISOString().split('T')[0];
  let g=document.getElementById('letGrade').value;
+ let fileInput=document.getElementById('letFile');
  if(!t||!b){alert('Title and Message required');return;}
  document.getElementById('letStatus').innerText='⏳ Publishing...';
  try{
-  await db.collection('letters').add({Title:t,Body:b,Date:d,GradeTarget:g,Timestamp:Date.now()});
+  let fileUrl="", fileName="";
+  if(fileInput.files.length>0){
+   let file=fileInput.files[0];
+   if(file.type!="application/pdf"){alert("Only PDF allowed");return;}
+   if(file.size>10*1024*1024){alert("PDF too big! Max 10MB");return;}
+   document.getElementById('letStatus').innerText='⏳ Uploading PDF...';
+   let storageRef=firebase.storage().ref('letters/'+Date.now()+'_'+file.name);
+   await storageRef.put(file);
+   fileUrl=await storageRef.getDownloadURL();
+   fileName=file.name;
+  }
+  await db.collection('letters').add({Title:t,Body:b,Date:d,GradeTarget:g,FileUrl:fileUrl,FileName:fileName,Timestamp:Date.now()});
   document.getElementById('letStatus').innerText='✅ Published! Parents can see it now.';
-  document.getElementById('letTitle').value='';document.getElementById('letBody').value='';
+  document.getElementById('letTitle').value='';document.getElementById('letBody').value='';document.getElementById('letFile').value='';document.getElementById('fileName').innerText='';
   loadLettersAdmin();
- }catch(e){document.getElementById('letStatus').innerText='❌ '+e.message;}
+ }catch(e){document.getElementById('letStatus').innerText='❌ '+e.message; console.log(e);}
 }
+document.getElementById('letFile').addEventListener('change',function(){
+ if(this.files.length>0) document.getElementById('fileName').innerText='📄 Selected: '+this.files[0].name;
+});
 async function loadLettersAdmin(){
  let list=document.getElementById('lettersListAdmin');
  try{
@@ -121,7 +147,7 @@ async function loadLettersAdmin(){
   let html='';
   snap.forEach(doc=>{
    let d=doc.data();
-   html+=`<div class="letter-card"><div style="font-size:11px;color:#800000">📅 ${d.Date} | ${d.GradeTarget}</div><div style="font-weight:900;color:#800000">${d.Title}</div><div style="font-size:13px;white-space:pre-wrap;margin:6px 0">${d.Body}</div><button onclick="deleteLetter('${doc.id}')" class="btn btnRed" style="padding:6px;font-size:12px">🗑️ DELETE LETTER</button></div>`;
+   html+=`<div class="letter-card"><div style="font-size:11px;color:#800000">📅 ${d.Date} | ${d.GradeTarget}</div><div style="font-weight:900;color:#800000">${d.Title}</div><div style="font-size:13px;white-space:pre-wrap;margin:6px 0">${d.Body}</div>${d.FileUrl?`<a href="${d.FileUrl}" target="_blank" style="display:block;background:#800000;color:white;padding:10px;text-align:center;border-radius:8px;text-decoration:none;margin:8px 0;font-weight:bold">📥 Download PDF: ${d.FileName||'Letter.pdf'}</a>`:''}<button onclick="deleteLetter('${doc.id}')" class="btn btnRed" style="padding:6px;font-size:12px">🗑️ DELETE LETTER</button></div>`;
   });
   list.innerHTML=html;
  }catch(e){list.innerHTML='❌ Error: '+e.message;}
