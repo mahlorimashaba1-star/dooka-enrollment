@@ -1,5 +1,5 @@
 <!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dooka ADMIN - No Storage</title>
+<title>Dooka ADMIN </title>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <style>
@@ -32,8 +32,8 @@ body{margin:0;background:#fdf8f5;font-family:Arial}
 <div id="sams" class="tabContent"><div class="card" style="border:3px solid #ffd700;background:#fffbe6"><h3 style="margin:0;color:#800000">SA-SAMS EXPORT</h3><button class="btn btnGold" onclick="exportSAMS()">EXPORT APPROVED</button></div><div id="samsList"></div></div>
 <div id="letters" class="tabContent">
 <div class="card" style="border:3px solid #800000;background:#fffbe6">
-<h3 style="margin:0;color:#800000">✉️ Publish Letter + PDF (No Storage)</h3>
-<p style="font-size:11px;color:#800000">PDF will be saved directly - Max 900KB - No billing needed</p>
+<h3 style="margin:0;color:#800000">✉️ Publish Letter + PDF </h3>
+<p style="font-size:11px;color:#800000">PDF will be saved - Max 900KB -  </p>
 <input id="letTitle" class="input" placeholder="Letter Title *">
 <textarea id="letBody" class="input" rows="4" placeholder="Message *"></textarea>
 <div style="background:white;padding:10px;border-radius:8px;border:2px dashed #800000;margin:8px 0">
@@ -43,7 +43,7 @@ body{margin:0;background:#fdf8f5;font-family:Arial}
 <small style="color:#666;font-size:10px">If bigger than 900KB, compress at smallpdf.com first</small>
 </div>
 <div style="display:flex;gap:6px"><input id="letDate" class="input" type="date" style="flex:1"><select id="letGrade" class="input" style="flex:1"><option>All Grades</option><option>Grade R</option><option>Grade 1</option><option>Grade 2</option><option>Grade 3</option><option>Grade 4</option><option>Grade 5</option><option>Grade 6</option><option>Grade 7</option></select></div>
-<button class="btn btnBlue" onclick="publishLetter()">📢 PUBLISH WITH PDF</button>
+<button class="btn btnBlue" onclick="publishLetter()">📢 PUBLISH</button>
 <p id="letStatus" style="text-align:center;font-weight:bold;font-size:12px"></p>
 </div>
 <div id="lettersListAdmin">Loading...</div>
