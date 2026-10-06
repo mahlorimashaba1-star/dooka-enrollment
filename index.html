@@ -29,15 +29,16 @@
 <div class="top-nav"><button id="btnEnroll" class="active" onclick="showTab('enroll')">👶 ENROLLMENT</button><button id="btnLetters" onclick="showTab('letters')">✉️ Official updates</button></div>
 <div id="enrollTab">
 <div class="box">
-<div class="section-title">👶 LEARNER INFORMATION</div>
+<div class="section-title">👶 LEARNER INFORMATION - SA-SAMS REQUIRED</div>
 <div class="row"><input id="name" class="input" placeholder="Learner Name *"><input id="surname" class="input" placeholder="Surname *"></div>
 <div class="row"><input id="dob" class="input" type="date"><select id="gender" class="input"><option value="">Gender *</option><option>Male</option><option>Female</option></select></div>
-<div class="row"><input id="learnerID" class="input" placeholder="Learner ID / Birth Cert No"><select id="race" class="input"><option value="">Race *</option><option value="B">B - Black</option><option value="W">W - White</option><option value="C">C - Coloured</option><option value="I">I - Indian</option><option value="O">O - Other</option></select></div>
-<div class="row"><select id="homeLang" class="input"><option value="">Home Language *</option><option value="Z">IsiZulu</option><option value="X">IsiXhosa</option><option value="S">Sesotho</option><option value="P">Sepedi</option><option value="T">Xitsonga</option><option value="V">Tshivenda</option><option value="W">Setswana</option><option value="N">IsiNdebele</option><option value="I">Siswati</option><option value="E">English</option><option value="A">Afrikaans</option></select><select id="grade" class="input"><option value="">Grade *</option><option>Grade R</option><option>Grade 1</option><option>Grade 2</option><option>Grade 3</option><option>Grade 4</option><option>Grade 5</option><option>Grade 6</option><option>Grade 7</option></select></div>
-<textarea id="address" class="input" placeholder="Home Address *"></textarea>
-<div class="section-title">👨‍👩‍👧 PARENT / GUARDIAN</div>
+<div class="row"><input id="learnerID" class="input" placeholder="Learner ID / Birth Cert No *"><select id="race" class="input"><option value="">Race *</option><option value="B">B - Black</option><option value="W">W - White</option><option value="C">C - Coloured</option><option value="I">I - Indian</option><option value="O">O - Other</option></select></div>
+<div class="row"><select id="homeLang" class="input"><option value="">Home Language *</option><option value="Z">IsiZulu</option><option value="X">IsiXhosa</option><option value="S">Sesotho</option><option value="P">Sepedi</option><option value="T">Xitsonga</option><option value="V">Tshivenda</option><option value="W">Setswana</option><option value="N">IsiNdebele</option><option value="I">Siswati</option><option value="E">English</option><option value="A">Afrikaans</option></select><select id="grade" class="input"><option value="">Grade Applying *</option><option>Grade R</option><option>Grade 1</option><option>Grade 2</option><option>Grade 3</option><option>Grade 4</option><option>Grade 5</option><option>Grade 6</option><option>Grade 7</option></select></div>
+<textarea id="address" class="input" placeholder="Home Address * (SA-SAMS)"></textarea>
+<div class="section-title">👨‍👩‍👧 PARENT / GUARDIAN - SA-SAMS REQUIRED</div>
 <div class="row"><input id="parentName" class="input" placeholder="Parent Full Names *"><select id="relation" class="input"><option value="">Relation *</option><option>Mother</option><option>Father</option><option>Guardian</option></select></div>
-<div class="row"><input id="parentPhone" class="input" placeholder="Cellphone *" type="tel"><input id="whatsapp" class="input" placeholder="WhatsApp *" type="tel"></div>
+<div class="row"><input id="parentID" class="input" placeholder="Parent ID Number * (SA-SAMS)" maxlength="13"><input id="parentPhone" class="input" placeholder="Cellphone *" type="tel"></div>
+<div class="row"><input id="whatsapp" class="input" placeholder="WhatsApp *" type="tel"><input id="parentPhone2" class="input" placeholder="Alternative Phone"></div>
 <div class="section-title">📎 DOCUMENTS</div>
 <div class="upload-box"><b>1. Birth Certificate *</b><br><input type="file" id="fileBirth" accept="image/*" onchange="handleFile(this,'statusBirth','prevBirth')"><span id="statusBirth" class="file-status"></span><br><img id="prevBirth" class="preview"></div>
 <div class="upload-box"><b>2. Parent ID *</b><br><input type="file" id="fileParentID" accept="image/*" onchange="handleFile(this,'statusParentID','prevParentID')"><span id="statusParentID" class="file-status"></span><br><img id="prevParentID" class="preview"></div>
@@ -46,8 +47,8 @@
 </div>
 <div class="box" style="border-color:green"><div class="section-title" style="background:green">🔍 CHECK STATUS</div><div class="row"><input id="checkInput" class="input" placeholder="Phone or Admission No"><button class="btn btn-green" onclick="checkStatus()" style="max-width:120px">CHECK</button></div><div id="statusResult" class="status-box"></div></div>
 </div>
-<div id="lettersTab" style="display:none"><div class="box"><h2 style="margin:0;color:#800000">✉️ School Letters for Parents</h2><p style="font-size:12px;color:#666;font-weight:bold">Official updates - Download PDFs</p><div id="lettersList">⏳ Loading letters...</div></div></div>
-<div class="footer">© 2026/2027 Dooka Primary School</div>
+<div id="lettersTab" style="display:none"><div class="box"><h2 style="margin:0;color:#800000">✉️ School Letters for Parents</h2><div id="lettersList">⏳ Loading letters...</div></div></div>
+<div class="footer">© 2026/2027 Dooka Primary School - SA-SAMS Ready</div>
 <script>
 const firebaseConfig={apiKey:"AIzaSyCVm-xNEv4IwZ5pk79YFOLOMapnAOlUCrM",authDomain:"dooka-enrollment.firebaseapp.com",projectId:"dooka-enrollment",storageBucket:"dooka-enrollment.firebasestorage.app",messagingSenderId:"75187233656",appId:"1:75187233656:web:962e5eba5b15892c295e8d"};
 firebase.initializeApp(firebaseConfig);const db=firebase.firestore();
@@ -55,8 +56,30 @@ function showTab(t){document.getElementById('enrollTab').style.display=t==='enro
 let docsData={birth:null,parentID:null,proof:null};
 function handleFile(input,sId,pId){let f=input.files[0];if(!f)return;document.getElementById(sId).innerText='⏳ Compressing...';let r=new FileReader();r.onload=e=>compressImage(e.target.result,c=>{let k=sId.includes('Birth')?'birth':sId.includes('Parent')?'parentID':'proof';docsData[k]=c;document.getElementById(sId).innerText='✅ Ready';let p=document.getElementById(pId);p.src=c;p.style.display='block';});r.readAsDataURL(f);}
 function compressImage(d,cb){let i=new Image();i.onload=()=>{let c=document.createElement('canvas');let m=800,s=m/i.width;if(s>1)s=1;c.width=i.width*s;c.height=i.height*s;c.getContext('2d').drawImage(i,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',0.6));};i.src=d;}
-async function submitEnroll(){let n=document.getElementById('name').value.trim(), s=document.getElementById('surname').value.trim(), g=document.getElementById('grade').value;let pp=document.getElementById('parentPhone').value.trim();if(!n||!s||!g||!pp){alert('Fill all *');return;}if(!docsData.birth||!docsData.parentID||!docsData.proof){alert('Upload 3 documents');return;}let btn=document.getElementById('btnSubmit');btn.disabled=true;btn.innerText='Saving...';try{let adm='DP'+Date.now().toString().slice(-6);let data={Date:new Date().toLocaleString(),Timestamp:Date.now(),AdmissionNo:adm,Name:n,Surname:s,FullName:n+' '+s,DOB:document.getElementById('dob').value,Gender:document.getElementById('gender').value,Grade:g,LearnerID:document.getElementById('learnerID').value,Race:document.getElementById('race').value,HomeLanguage:document.getElementById('homeLang').value,Address:document.getElementById('address').value,ParentName:document.getElementById('parentName').value,Relation:document.getElementById('relation').value,ParentPhone:pp,WhatsApp:document.getElementById('whatsapp').value,BirthCertFile:docsData.birth,ParentIDFile:docsData.parentID,ProofFile:docsData.proof,Status:'Pending'};await db.collection('enrollments').add(data);document.getElementById('status').innerText='✅ SUCCESS! Admission No: '+adm; alert('Enrolled! No: '+adm); location.reload();}catch(e){document.getElementById('status').innerText='❌ '+e.message;btn.disabled=false;btn.innerText='📨 SUBMIT ENROLLMENT';}}
-async function checkStatus(){let q=document.getElementById('checkInput').value.trim();if(!q)return alert('Enter phone');let res=document.getElementById('statusResult');res.style.display='block';res.innerHTML='⏳ Checking...';let snap=await db.collection('enrollments').get();let found=null;snap.forEach(doc=>{let d=doc.data();if((d.AdmissionNo&&d.AdmissionNo.toLowerCase()==q.toLowerCase())||(d.ParentPhone&&d.ParentPhone.includes(q)))found=d;});if(!found){res.innerHTML='❌ No application for: '+q;return;}res.innerHTML=`<b>STATUS: ${found.Status}</b><br>Learner: ${found.FullName}<br>Grade: ${found.Grade}<br>Admission No: ${found.AdmissionNo}`;}
+async function submitEnroll(){
+let n=document.getElementById('name').value.trim(), s=document.getElementById('surname').value.trim(), g=document.getElementById('grade').value;
+let pp=document.getElementById('parentPhone').value.trim();
+let pid=document.getElementById('parentID').value.trim();
+if(!n||!s||!g||!pp||!pid){alert('Fill all * - including Parent ID for SA-SAMS');return;}
+if(!docsData.birth||!docsData.parentID||!docsData.proof){alert('Upload 3 documents');return;}
+let btn=document.getElementById('btnSubmit');btn.disabled=true;btn.innerText='Saving...';
+try{
+let adm='DP'+Date.now().toString().slice(-6);
+let data={
+Date:new Date().toLocaleString(),Timestamp:Date.now(),AdmissionNo:adm,
+Name:n,Surname:s,FullName:n+' '+s,
+DOB:document.getElementById('dob').value,Gender:document.getElementById('gender').value,
+Grade:g,LearnerID:document.getElementById('learnerID').value,
+Race:document.getElementById('race').value,HomeLanguage:document.getElementById('homeLang').value,
+Address:document.getElementById('address').value,
+ParentName:document.getElementById('parentName').value,Relation:document.getElementById('relation').value,
+ParentID:pid,ParentPhone:pp,WhatsApp:document.getElementById('whatsapp').value,ParentPhone2:document.getElementById('parentPhone2').value,
+BirthCertFile:docsData.birth,ParentIDFile:docsData.parentID,ProofFile:docsData.proof,Status:'Pending'};
+await db.collection('enrollments').add(data);
+document.getElementById('status').innerText='✅ SUCCESS! Admission No: '+adm+' - Ready for SA-SAMS'; alert('Enrolled! No: '+adm); location.reload();
+}catch(e){document.getElementById('status').innerText='❌ '+e.message;btn.disabled=false;btn.innerText='📨 SUBMIT ENROLLMENT';}
+}
+async function checkStatus(){let q=document.getElementById('checkInput').value.trim();if(!q)return alert('Enter phone');let res=document.getElementById('statusResult');res.style.display='block';res.innerHTML='⏳ Checking...';let snap=await db.collection('enrollments').get();let found=null;snap.forEach(doc=>{let d=doc.data();if((d.AdmissionNo&&d.AdmissionNo.toLowerCase()==q.toLowerCase())||(d.ParentPhone&&d.ParentPhone.includes(q)))found=d;});if(!found){res.innerHTML='❌ No application for: '+q;return;}res.innerHTML=`<b>STATUS: ${found.Status}</b><br>Learner: ${found.FullName}<br>Grade: ${found.Grade}<br>Admission No: ${found.AdmissionNo}<br>SA-SAMS: ${found.Race}/${found.HomeLanguage}`;}
 async function loadLetters(){
 let list=document.getElementById('lettersList');
 try{
@@ -65,11 +88,8 @@ if(snap.empty){list.innerHTML='<p>No letters yet.</p>';return;}
 let h='';snap.forEach(doc=>{
 let d=doc.data();
 let pdfBtn='';
-if(d.FileData){
-  pdfBtn=`<a href="${d.FileData}" download="${d.FileName||'letter.pdf'}" style="display:block;background:#800000;color:#ffd700;padding:12px;text-align:center;border-radius:10px;text-decoration:none;font-weight:900;margin-top:12px;border:2px solid #ffd700">📥 DOWNLOAD PDF - ${d.FileName||'Letter.pdf'}</a><small style="color:#666;font-size:10px">Tap to download PDF</small>`;
-}else if(d.FileUrl && d.FileUrl.startsWith('http')){
-  pdfBtn=`<a href="${d.FileUrl}" target="_blank" style="display:block;background:#800000;color:#ffd700;padding:12px;text-align:center;border-radius:10px;text-decoration:none;font-weight:900;margin-top:12px;border:2px solid #ffd700">📥 DOWNLOAD PDF</a>`;
-}
+if(d.FileData){ pdfBtn=`<a href="${d.FileData}" download="${d.FileName||'letter.pdf'}" style="display:block;background:#800000;color:#ffd700;padding:12px;text-align:center;border-radius:10px;text-decoration:none;font-weight:900;margin-top:12px;border:2px solid #ffd700">📥 DOWNLOAD PDF - ${d.FileName||'Letter.pdf'}</a>`; }
+else if(d.FileUrl && d.FileUrl.startsWith('http')){ pdfBtn=`<a href="${d.FileUrl}" target="_blank" style="display:block;background:#800000;color:#ffd700;padding:12px;text-align:center;border-radius:10px;text-decoration:none;font-weight:900;margin-top:12px;border:2px solid #ffd700">📥 DOWNLOAD PDF</a>`; }
 h+=`<div class="letter-card"><div style="font-size:11px;color:#888">📅 ${d.Date} | ${d.GradeTarget}</div><div style="font-weight:900;color:#800000;margin:5px 0;font-size:16px">${d.Title}</div><div style="white-space:pre-wrap;font-size:14px;line-height:1.4">${d.Body}</div>${pdfBtn}</div>`;
 });
 list.innerHTML=h;
