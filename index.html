@@ -1,38 +1,106 @@
 <!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dooka Primary - School Letters</title>
+<title>Dooka Primary - Enrollment & Letters</title>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <style>
 *{box-sizing:border-box;font-family:Arial,sans-serif}body{background:#fdf0f0;margin:0}
 .header{background:#800000;color:white;padding:20px;text-align:center}
 .box{background:white;margin:12px;padding:18px;border-radius:14px;border:3px solid #800000}
+.section-title{background:#800000;color:#ffd700;padding:8px 12px;border-radius:8px;margin:18px 0 8px;font-weight:900}
+.input,select,textarea{width:100%;padding:13px;border:2px solid #800000;border-radius:10px;margin:7px 0;font-weight:bold}
+.row{display:flex;gap:8px}.row>*{flex:1}@media(max-width:600px){.row{flex-direction:column}}
+.btn{width:100%;padding:16px;border:none;border-radius:12px;font-weight:900;font-size:18px;cursor:pointer;background:#800000;color:#ffd700}
+.btn-green{background:green;color:white}
+.upload-box{border:2px dashed #800000;padding:12px;border-radius:10px;margin:10px 0;background:#fff8e1}
+.file-status{font-size:12px;font-weight:bold;color:green}.preview{max-width:100%;max-height:120px;border-radius:8px;margin-top:5px;display:none}
+.status-box{border:3px solid #800000;border-radius:12px;padding:15px;margin-top:15px;background:#fffbe6;display:none}
+.top-nav{background:white;display:flex;position:sticky;top:0;z-index:99;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
+.top-nav button{flex:1;padding:14px;border:none;font-weight:900;font-size:15px;cursor:pointer;background:#eee}
+.top-nav button.active{background:#800000;color:#ffd700}
 .letter-card{background:white;border-left:6px solid #800000;padding:14px;margin:12px 0;border-radius:10px;box-shadow:0 2px 5px rgba(0,0,0,0.1)}
 .footer{text-align:center;padding:15px;font-size:11px;color:#666;font-weight:bold}
 </style></head><body>
-<div class="header"><h2>DOOKA PRIMARY SCHOOL</h2><p style="color:#ffd700;font-weight:900">THUTO BOTSHELO</p><p style="font-size:12px">OFFICIAL SCHOOL LETTERS FOR PARENTS</p></div>
+<div class="header"><h2>DOOKA PRIMARY SCHOOL</h2><p style="color:#ffd700;font-weight:900;margin:5px">THUTO BOTSHELO</p><p style="font-size:11px;color:#ffcccc">ENROLLMENT & SCHOOL LETTERS</p></div>
+
+<div class="top-nav">
+<button id="btnEnroll" class="active" onclick="showTab('enroll')">👶 ENROLLMENT</button>
+<button id="btnLetters" onclick="showTab('letters')">✉️ SCHOOL LETTERS</button>
+</div>
+
+<!-- ENROLLMENT TAB -->
+<div id="enrollTab">
 <div class="box">
-<h2 style="color:#800000;margin:0">✉️ Latest Letters</h2>
-<p style="font-size:13px;color:#666;font-weight:bold">All official updates from school. Pull down to refresh.</p>
+<div class="section-title">👶 LEARNER INFORMATION</div>
+<div class="row"><input id="name" class="input" placeholder="Learner Name *"><input id="surname" class="input" placeholder="Surname *"></div>
+<div class="row"><input id="dob" class="input" type="date"><select id="gender" class="input"><option value="">Gender *</option><option>Male</option><option>Female</option></select></div>
+<div class="row"><input id="learnerID" class="input" placeholder="Learner ID / Birth Cert No"><select id="race" class="input"><option value="">Race *</option><option value="B">B - Black</option><option value="W">W - White</option><option value="C">C - Coloured</option><option value="I">I - Indian</option><option value="O">O - Other</option></select></div>
+<div class="row"><select id="homeLang" class="input"><option value="">Home Language *</option><option value="Z">IsiZulu</option><option value="X">IsiXhosa</option><option value="S">Sesotho</option><option value="P">Sepedi</option><option value="T">Xitsonga</option><option value="V">Tshivenda</option><option value="W">Setswana</option><option value="N">IsiNdebele</option><option value="I">Siswati</option><option value="E">English</option><option value="A">Afrikaans</option></select><select id="grade" class="input"><option value="">Grade *</option><option>Grade R</option><option>Grade 1</option><option>Grade 2</option><option>Grade 3</option><option>Grade 4</option><option>Grade 5</option><option>Grade 6</option><option>Grade 7</option></select></div>
+<textarea id="address" class="input" placeholder="Home Address *"></textarea>
+<div class="section-title">👨‍👩‍👧 PARENT / GUARDIAN</div>
+<div class="row"><input id="parentName" class="input" placeholder="Parent Full Names *"><select id="relation" class="input"><option value="">Relation *</option><option>Mother</option><option>Father</option><option>Guardian</option></select></div>
+<div class="row"><input id="parentPhone" class="input" placeholder="Cellphone *" type="tel"><input id="whatsapp" class="input" placeholder="WhatsApp *" type="tel"></div>
+<div class="section-title">📎 DOCUMENTS</div>
+<div class="upload-box"><b>1. Birth Certificate *</b><br><input type="file" id="fileBirth" accept="image/*" onchange="handleFile(this,'statusBirth','prevBirth')"><span id="statusBirth" class="file-status"></span><br><img id="prevBirth" class="preview"></div>
+<div class="upload-box"><b>2. Parent ID *</b><br><input type="file" id="fileParentID" accept="image/*" onchange="handleFile(this,'statusParentID','prevParentID')"><span id="statusParentID" class="file-status"></span><br><img id="prevParentID" class="preview"></div>
+<div class="upload-box"><b>3. Proof of Residence *</b><br><input type="file" id="fileProof" accept="image/*" onchange="handleFile(this,'statusProof','prevProof')"><span id="statusProof" class="file-status"></span><br><img id="prevProof" class="preview"></div>
+<button id="btnSubmit" class="btn" onclick="submitEnroll()">📨 SUBMIT ENROLLMENT</button>
+<p id="status" style="text-align:center;font-weight:bold"></p>
+</div>
+<div class="box" style="border-color:green"><div class="section-title" style="background:green">🔍 CHECK STATUS</div><div class="row"><input id="checkInput" class="input" placeholder="Phone or Admission No"><button class="btn btn-green" onclick="checkStatus()" style="max-width:120px">CHECK</button></div><div id="statusResult" class="status-box"></div></div>
+</div>
+
+<!-- LETTERS TAB - VIEW ONLY -->
+<div id="lettersTab" style="display:none">
+<div class="box">
+<h2 style="margin:0;color:#800000">✉️ School Letters for Parents</h2>
+<p style="font-size:12px;color:#666;font-weight:bold">Official updates only - Parents can VIEW only</p>
 <div id="lettersList">⏳ Loading letters...</div>
 </div>
-<div class="footer">© 2027 Dooka Primary - Bosplaas</div>
+</div>
+
+<div class="footer">© Dooka Primary - <a href="admin.html" style="color:#800000">Admin Login</a></div>
+
 <script>
 const firebaseConfig={apiKey:"AIzaSyCVm-xNEv4IwZ5pk79YFOLOMapnAOlUCrM",authDomain:"dooka-enrollment.firebaseapp.com",projectId:"dooka-enrollment",storageBucket:"dooka-enrollment.firebasestorage.app",messagingSenderId:"75187233656",appId:"1:75187233656:web:962e5eba5b15892c295e8d"};
 firebase.initializeApp(firebaseConfig);const db=firebase.firestore();
-async function loadLetters(){
- let list=document.getElementById('lettersList');
- try{
-  let snap=await db.collection('letters').orderBy('Timestamp','desc').get();
-  if(snap.empty){list.innerHTML='<p>No letters yet. School will publish soon.</p>';return;}
-  let html='';
-  snap.forEach(doc=>{
-   let d=doc.data();
-   html+=`<div class="letter-card"><div style="font-size:11px;color:#888">📅 ${d.Date} | ${d.GradeTarget}</div><div style="font-weight:900;color:#800000;margin:5px 0;font-size:16px">${d.Title}</div><div style="line-height:1.6;white-space:pre-wrap">${d.Body}</div></div>`;
-  });
-  list.innerHTML=html;
- }catch(e){list.innerHTML='❌ Error: '+e.message;}
+function showTab(t){
+document.getElementById('enrollTab').style.display=t==='enroll'?'block':'none';
+document.getElementById('lettersTab').style.display=t==='letters'?'block':'none';
+document.getElementById('btnEnroll').className=t==='enroll'?'active':'';
+document.getElementById('btnLetters').className=t==='letters'?'active':'';
+if(t==='letters') loadLetters();
 }
-loadLetters();
-setInterval(loadLetters, 30000);
+let docsData={birth:null,parentID:null,proof:null};
+function handleFile(input,sId,pId){let f=input.files[0];if(!f)return;document.getElementById(sId).innerText='⏳ Compressing...';let r=new FileReader();r.onload=e=>compressImage(e.target.result,c=>{let k=sId.includes('Birth')?'birth':sId.includes('Parent')?'parentID':'proof';docsData[k]=c;document.getElementById(sId).innerText='✅ Ready';let p=document.getElementById(pId);p.src=c;p.style.display='block';});r.readAsDataURL(f);}
+function compressImage(d,cb){let i=new Image();i.onload=()=>{let c=document.createElement('canvas');let m=800,s=m/i.width;if(s>1)s=1;c.width=i.width*s;c.height=i.height*s;c.getContext('2d').drawImage(i,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',0.6));};i.src=d;}
+async function submitEnroll(){
+let n=document.getElementById('name').value.trim(), s=document.getElementById('surname').value.trim(), g=document.getElementById('grade').value;
+let pp=document.getElementById('parentPhone').value.trim();
+if(!n||!s||!g||!pp){alert('Fill all *');return;}
+if(!docsData.birth||!docsData.parentID||!docsData.proof){alert('Upload 3 documents');return;}
+let btn=document.getElementById('btnSubmit');btn.disabled=true;btn.innerText='Saving...';
+try{
+let adm='DP'+Date.now().toString().slice(-6);
+let data={Date:new Date().toLocaleString(),Timestamp:Date.now(),AdmissionNo:adm,Name:n,Surname:s,FullName:n+' '+s,DOB:document.getElementById('dob').value,Gender:document.getElementById('gender').value,Grade:g,LearnerID:document.getElementById('learnerID').value,Race:document.getElementById('race').value,HomeLanguage:document.getElementById('homeLang').value,Address:document.getElementById('address').value,ParentName:document.getElementById('parentName').value,Relation:document.getElementById('relation').value,ParentPhone:pp,WhatsApp:document.getElementById('whatsapp').value,BirthCertFile:docsData.birth,ParentIDFile:docsData.parentID,ProofFile:docsData.proof,Status:'Pending'};
+await db.collection('enrollments').add(data);
+document.getElementById('status').innerText='✅ SUCCESS! Admission No: '+adm; alert('Enrolled! No: '+adm); location.reload();
+}catch(e){document.getElementById('status').innerText='❌ '+e.message;btn.disabled=false;btn.innerText='📨 SUBMIT ENROLLMENT';}
+}
+async function checkStatus(){
+let q=document.getElementById('checkInput').value.trim();if(!q)return alert('Enter phone');
+let res=document.getElementById('statusResult');res.style.display='block';res.innerHTML='⏳ Checking...';
+let snap=await db.collection('enrollments').get();let found=null;snap.forEach(doc=>{let d=doc.data();if((d.AdmissionNo&&d.AdmissionNo.toLowerCase()==q.toLowerCase())||(d.ParentPhone&&d.ParentPhone.includes(q)))found=d;});
+if(!found){res.innerHTML='❌ No application for: '+q;return;}
+res.innerHTML=`<b>STATUS: ${found.Status}</b><br>Learner: ${found.FullName}<br>Grade: ${found.Grade}<br>Admission No: ${found.AdmissionNo}`;
+}
+async function loadLetters(){
+let list=document.getElementById('lettersList');
+try{
+let snap=await db.collection('letters').orderBy('Timestamp','desc').get();
+if(snap.empty){list.innerHTML='<p>No letters yet.</p>';return;}
+let h='';snap.forEach(doc=>{let d=doc.data();h+=`<div class="letter-card"><div style="font-size:11px;color:#888">📅 ${d.Date} | ${d.GradeTarget}</div><div style="font-weight:900;color:#800000;margin:5px 0">${d.Title}</div><div style="white-space:pre-wrap">${d.Body}</div></div>`;});
+list.innerHTML=h;
+}catch(e){list.innerHTML='❌ '+e.message;}
+}
 </script></body></html>
