@@ -1,8 +1,7 @@
 <!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dooka ADMIN </title>
+<title>Dooka ADMIN - No Storage</title>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 <style>
 body{margin:0;background:#fdf8f5;font-family:Arial}
 .top{background:#800000;color:white;padding:12px;text-align:center;border-bottom:5px solid #ffd700;position:sticky;top:0;z-index:50}
@@ -12,56 +11,43 @@ body{margin:0;background:#fdf8f5;font-family:Arial}
 .tabContent{display:none}.tabContent.active{display:block}
 .card{background:white;margin:8px;padding:10px;border-radius:10px;box-shadow:0 2px 4px #999}
 .btn{width:100%;padding:11px;border:0;border-radius:10px;font-weight:bold;color:white;cursor:pointer;margin-top:5px}
-.btnGreen{background:green}.btnGold{background:#ffd700;color:#800000;border:2px solid #800000}.btnRed{background:#d00}.btnOrange{background:orange}.btnBlue{background:#800000}
+.btnGreen{background:green}.btnGold{background:#ffd700;color:#800000;border:2px solid #800000}.btnRed{background:#d00}.btnBlue{background:#800000}
 #lockScreen{position:fixed;top:0;left:0;width:100%;height:100%;background:#800000;display:flex;align-items:center;justify-content:center;z-index:9999}
 .lockBox{background:white;padding:25px;border-radius:15px;width:90%;max-width:350px;text-align:center;border:3px solid #ffd700}
-.docImg{max-width:100%;max-height:200px;border-radius:8px;border:2px solid #800000;margin:5px 0;display:block}
-.badge{padding:2px 7px;border-radius:10px;color:white;font-size:10px}
 .input,textarea,select{width:100%;padding:10px;border:2px solid #800000;border-radius:8px;margin:5px 0;box-sizing:border-box}
 .letter-card{border-left:6px solid #800000;background:#fffbe6;padding:12px;margin:8px 0;border-radius:8px}
+.badge{padding:2px 7px;border-radius:10px;color:white;font-size:10px}
 </style>
 </head><body>
-
-<div id="lockScreen"><div class="lockBox"><h2 style="color:#800000;margin:0">🔒 DOOKA ADMIN</h2><p style="color:#800000;font-weight:bold">DOOKA PRIMARY</p><input id="pwd" type="password" placeholder="Enter Password" style="width:100%;padding:12px;border:2px solid #800000;border-radius:8px;text-align:center;font-size:16px"><button class="btn btnGreen" onclick="checkPwd()">UNLOCK</button><small id="pwdErr" style="color:red;display:none">Wrong password!</small><br><small style="color:#888">Default: Dooka2026!</small><br><button onclick="localStorage.clear();location.reload()" style="margin-top:10px;font-size:10px;background:none;border:0;color:#888">Forgot? Logout</button></div></div>
-
+<div id="lockScreen"><div class="lockBox"><h2 style="color:#800000;margin:0">🔒 DOOKA ADMIN</h2><p style="color:#800000;font-weight:bold">DOOKA PRIMARY</p><input id="pwd" type="password" placeholder="Enter Password" style="width:100%;padding:12px;border:2px solid #800000;border-radius:8px;text-align:center;font-size:16px"><button class="btn btnGreen" onclick="checkPwd()">UNLOCK</button><small id="pwdErr" style="color:red;display:none">Wrong password!</small></div></div>
 <div class="top"><h2 style="margin:0">DOOKA PRIMARY - ADMIN</h2><small id="cnt">Loading...</small></div>
 <div class="tabs">
-<button id="b1" class="active" onclick="showTab('apps')">👨‍👩‍👧 PENDING <span id="appCount" style="background:red;color:white;padding:2px 6px;border-radius:10px">0</span></button>
-<button id="b2" onclick="showTab('approved')">✅ APPROVED <span id="approvedCount" style="background:green;color:white;padding:2px 6px;border-radius:10px">0</span></button>
-<button id="b3" onclick="showTab('sams')">🎓 SA-SAMS</button>
-<button id="b4" onclick="showTab('letters')">✉️ LETTERS <span id="letterCount" style="background:#800000;color:white;padding:2px 6px;border-radius:10px">0</span></button>
+<button id="b1" class="active" onclick="showTab('apps')">PENDING <span id="appCount" style="background:red;color:white;padding:2px 6px;border-radius:10px">0</span></button>
+<button id="b2" onclick="showTab('approved')">APPROVED <span id="approvedCount" style="background:green;color:white;padding:2px 6px;border-radius:10px">0</span></button>
+<button id="b3" onclick="showTab('sams')">SA-SAMS</button>
+<button id="b4" onclick="showTab('letters')">LETTERS <span id="letterCount" style="background:#800000;color:white;padding:2px 6px;border-radius:10px">0</span></button>
 </div>
-
 <div id="apps" class="tabContent active"><div id="appList"></div></div>
 <div id="approved" class="tabContent"><div id="approvedList"></div></div>
-<div id="sams" class="tabContent">
-<div class="card" style="border:3px solid #ffd700;background:#fffbe6"><h3 style="margin:0;color:#800000">⭐ SA-SAMS / LURITS EXPORT</h3><p style="font-size:12px;line-height:1.4">This exports <b>ONLY Approved learners</b> with all SA-SAMS required fields</p>
-<button class="btn btnGold" onclick="exportSAMS()">⭐ EXPORT APPROVED FOR SA-SAMS / LURITS</button>
-<button class="btn btnGreen" onclick="exportSAMSAll()">Export ALL - Backup</button>
-</div><div id="samsList"></div>
-</div>
-
+<div id="sams" class="tabContent"><div class="card" style="border:3px solid #ffd700;background:#fffbe6"><h3 style="margin:0;color:#800000">SA-SAMS EXPORT</h3><button class="btn btnGold" onclick="exportSAMS()">EXPORT APPROVED</button></div><div id="samsList"></div></div>
 <div id="letters" class="tabContent">
 <div class="card" style="border:3px solid #800000;background:#fffbe6">
-<h3 style="margin:0;color:#800000">✉️ Publish New Letter to Parents</h3>
-<p style="font-size:11px;color:#800000">This will appear instantly on parents site under SCHOOL LETTERS tab</p>
-<input id="letTitle" class="input" placeholder="Letter Title * e.g. Parents Meeting 15 Oct 2026">
-<textarea id="letBody" class="input" rows="5" placeholder="Write full letter message here... *"></textarea>
-
+<h3 style="margin:0;color:#800000">✉️ Publish Letter + PDF (No Storage)</h3>
+<p style="font-size:11px;color:#800000">PDF will be saved directly - Max 900KB - No billing needed</p>
+<input id="letTitle" class="input" placeholder="Letter Title *">
+<textarea id="letBody" class="input" rows="4" placeholder="Message *"></textarea>
 <div style="background:white;padding:10px;border-radius:8px;border:2px dashed #800000;margin:8px 0">
-<label style="font-weight:900;color:#800000;font-size:12px">📎 Attach PDF Letter (Optional):</label>
+<label style="font-weight:900;color:#800000;font-size:12px">📎 Attach PDF (Optional - Max 900KB):</label>
 <input id="letFile" type="file" accept=".pdf" style="width:100%;margin-top:6px">
-<small id="fileName" style="color:green;font-size:11px;font-weight:bold"></small>
-<small style="display:block;color:#666;font-size:10px;margin-top:3px">Max 10MB. Only PDF allowed.</small>
+<small id="fileName" style="font-weight:bold"></small><br>
+<small style="color:#666;font-size:10px">If bigger than 900KB, compress at smallpdf.com first</small>
 </div>
-
 <div style="display:flex;gap:6px"><input id="letDate" class="input" type="date" style="flex:1"><select id="letGrade" class="input" style="flex:1"><option>All Grades</option><option>Grade R</option><option>Grade 1</option><option>Grade 2</option><option>Grade 3</option><option>Grade 4</option><option>Grade 5</option><option>Grade 6</option><option>Grade 7</option></select></div>
-<button class="btn btnBlue" onclick="publishLetter()">📢 PUBLISH LETTER TO ALL PARENTS</button>
+<button class="btn btnBlue" onclick="publishLetter()">📢 PUBLISH WITH PDF</button>
 <p id="letStatus" style="text-align:center;font-weight:bold;font-size:12px"></p>
 </div>
-<div id="lettersListAdmin">Loading letters...</div>
+<div id="lettersListAdmin">Loading...</div>
 </div>
-
 <script>
 const ADMIN_PASSWORD=600100319;
 function checkPwd(){if(document.getElementById('pwd').value===ADMIN_PASSWORD){localStorage.setItem('dooka_admin_ok','yes');document.getElementById('lockScreen').style.display='none';}else{document.getElementById('pwdErr').style.display='block';}}
@@ -72,16 +58,9 @@ firebase.initializeApp(firebaseConfig); const db=firebase.firestore();
 let allApproved=[], allPending=[];
 db.collection("enrollments").orderBy("Timestamp","desc").onSnapshot(snap=>{
  let pendingHtml="", approvedHtml="", samsPreview=""; allApproved=[]; allPending=[]; let pendCount=0, apprCount=0;
- snap.forEach(doc=>{
-  let a=doc.data(); let id=doc.id;
-  if(a.Status=="Pending" ||!a.Status || a.Status=="pending"){
-   pendCount++; allPending.push({...a, _id:id});
-   pendingHtml+=`<div class=card style="border-left:6px solid orange"><b>🆕 ${a.FullName||a.Name+' '+a.Surname}</b> - <span class=badge style="background:orange">PENDING</span><br><b>Adm:</b> ${a.AdmissionNo} | <b>Grade:</b> ${a.Grade}<br><small><b>DOB:</b> ${a.DOB||""} | <b>Gender:</b> ${a.Gender} | <b>ID:</b> ${a.LearnerID||"No ID"}<br><b>Race:</b> ${a.Race||""} | <b>Lang:</b> ${a.HomeLanguage||""}<br><b>Parent:</b> ${a.ParentName} (${a.Relation}) - ${a.ParentPhone}<br><b>Addr:</b> ${a.Address}</small><br><br><b>📎 Documents:</b><br>${a.BirthCertFile?`<img src="${a.BirthCertFile}" class=docImg>`:"❌ No Birth"}<br>${a.ParentIDFile?`<img src="${a.ParentIDFile}" class=docImg>`:"❌ No Parent ID"}<br>${a.ProofFile?`<img src="${a.ProofFile}" class=docImg>`:"❌ No Proof"}<br><br><button onclick="updateStatus('${id}','Approved')" class=btn btnGreen>✅ APPROVE</button><button onclick="updateStatus('${id}','Rejected')" class=btn btnRed>❌ REJECT</button></div>`;
-  } else if(a.Status=="Approved"){
-   apprCount++; allApproved.push({...a, _id:id});
-   approvedHtml+=`<div class=card style="border-left:6px solid green"><b>✅ ${a.FullName}</b> - ${a.Grade} - ${a.AdmissionNo} <span class=badge style="background:green">APPROVED</span><br><button onclick="updateStatus('${id}','Pending')" style="background:orange;color:white;border:0;padding:5px 10px;border-radius:5px;margin-top:5px">↩ Pending</button> <button onclick="if(confirm('Delete?'))db.collection('enrollments').doc('${id}').delete()" style="background:#d00;color:white;border:0;padding:5px 10px;border-radius:5px">Delete</button></div>`;
-   samsPreview+=`<div class=card><b>${a.Surname} ${a.Name}</b> - Gr ${(a.Grade||"").replace("Grade ","")} | ${a.Race}/${a.HomeLanguage} | ID:${a.LearnerID||""}<br><small>${a.AdmissionNo}</small></div>`;
-  }
+ snap.forEach(doc=>{ let a=doc.data(); let id=doc.id;
+  if(a.Status=="Pending" ||!a.Status || a.Status=="pending"){ pendCount++; allPending.push({...a, _id:id}); pendingHtml+=`<div class=card style="border-left:6px solid orange"><b>${a.FullName||a.Name+' '+a.Surname}</b> - PENDING<br><b>Adm:</b> ${a.AdmissionNo} | <b>Grade:</b> ${a.Grade}<br><button onclick="updateStatus('${id}','Approved')" class=btn btnGreen>APPROVE</button><button onclick="updateStatus('${id}','Rejected')" class=btn btnRed>REJECT</button></div>`; }
+  else if(a.Status=="Approved"){ apprCount++; allApproved.push({...a, _id:id}); approvedHtml+=`<div class=card style="border-left:6px solid green"><b>✅ ${a.FullName}</b> - ${a.Grade}</div>`; samsPreview+=`<div class=card><b>${a.Surname} ${a.Name}</b> - Gr ${(a.Grade||"").replace("Grade ","")}</div>`; }
  });
  document.getElementById('appCount').innerText=pendCount; document.getElementById('approvedCount').innerText=apprCount;
  document.getElementById('appList').innerHTML=pendingHtml||"<div class=card>No pending</div>";
@@ -89,26 +68,8 @@ db.collection("enrollments").orderBy("Timestamp","desc").onSnapshot(snap=>{
  document.getElementById('samsList').innerHTML=samsPreview;
  document.getElementById('cnt').innerText=pendCount+" pending | "+apprCount+" approved";
 });
-function updateStatus(id,status){db.collection("enrollments").doc(id).update({Status:status}).then(()=>{alert("✅ Status: "+status);});}
-function exportSAMS(){
- if(allApproved.length==0)return alert("No APPROVED!");
- let csv="Surname,First Names,Learner ID,Birth Certificate No,Date of Birth,Gender,Race,Home Language,Grade,Class,Parent Name,Parent ID,Parent Cell,WhatsApp,Parent Phone2,Address,Admission No,Status,Notes\n";
- allApproved.forEach(a=>{
-  let gradeOnly=(a.Grade||"").replace("Grade ","").trim();
-  let genderCode=(a.Gender||"").toLowerCase().includes("f")?"F":"M";
-  let dobF=(a.DOB||"").split("-").join("/");
-  csv+=`"${(a.Surname||"").replace(/"/g,'')}","${(a.Name||"").replace(/"/g,'')}","${a.LearnerID||""}","${a.LearnerID||""}","${dobF}","${genderCode}","${a.Race||""}","${a.HomeLanguage||""}","${gradeOnly}","","${(a.ParentName||"").replace(/"/g,'')}","${a.ParentID||""}","${a.ParentPhone||""}","${a.WhatsApp||""}","${a.ParentPhone2||""}","${(a.Address||"").replace(/"/g,'')}","${a.AdmissionNo||""}","ENROLLED","${(a.Notes||"").replace(/"/g,'')}"\n`;
- });
- let blob=new Blob([csv],{type:"text/csv"});let aa=document.createElement("a");aa.href=URL.createObjectURL(blob);aa.download="Dooka_APPROVED_SA-SAMS_"+new Date().toISOString().slice(0,10)+".csv";aa.click();
-}
-function exportSAMSAll(){
- let all=[...allPending,...allApproved]; if(all.length==0)return alert("No data!");
- let csv="Surname,First Names,Learner ID,Date of Birth,Gender,Race,Home Language,Grade,Parent Cell,Admission No,Status\n";
- all.forEach(a=>{let gradeOnly=(a.Grade||"").replace("Grade ","").trim();let genderCode=(a.Gender||"").toLowerCase().includes("f")?"F":"M";let dobF=(a.DOB||"").split("-").join("/");csv+=`"${a.Surname}","${a.Name}","${a.LearnerID}","${dobF}","${genderCode}","${a.Race}","${a.HomeLanguage}","${gradeOnly}","${a.ParentPhone}","${a.AdmissionNo}","${a.Status}"\n`;});
- let blob=new Blob([csv],{type:"text/csv"});let aa=document.createElement("a");aa.href=URL.createObjectURL(blob);aa.download="Dooka_ALL_Backup.csv";aa.click();
-}
-
-// LETTERS WITH PDF
+function updateStatus(id,status){db.collection("enrollments").doc(id).update({Status:status}).then(()=>{alert("Status: "+status);});}
+function exportSAMS(){ if(allApproved.length==0)return alert("No APPROVED!"); let csv="Surname,First Names,Learner ID,Date of Birth,Gender,Race,Home Language,Grade,Parent Cell,Admission No,Status\n"; allApproved.forEach(a=>{let g=(a.Grade||"").replace("Grade ","").trim();let gc=(a.Gender||"").toLowerCase().includes("f")?"F":"M";let dob=(a.DOB||"").split("-").join("/");csv+=`"${a.Surname}","${a.Name}","${a.LearnerID}","${dob}","${gc}","${a.Race}","${a.HomeLanguage}","${g}","${a.ParentPhone}","${a.AdmissionNo}","${a.Status}"\n`;}); let blob=new Blob([csv],{type:"text/csv"});let aa=document.createElement("a");aa.href=URL.createObjectURL(blob);aa.download="Dooka_APPROVED.csv";aa.click();}
 async function publishLetter(){
  let t=document.getElementById('letTitle').value.trim();
  let b=document.getElementById('letBody').value.trim();
@@ -118,25 +79,27 @@ async function publishLetter(){
  if(!t||!b){alert('Title and Message required');return;}
  document.getElementById('letStatus').innerText='⏳ Publishing...';
  try{
-  let fileUrl="", fileName="";
+  let fileUrl="", fileName="", fileData="";
   if(fileInput.files.length>0){
    let file=fileInput.files[0];
    if(file.type!="application/pdf"){alert("Only PDF allowed");return;}
-   if(file.size>10*1024*1024){alert("PDF too big! Max 10MB");return;}
-   document.getElementById('letStatus').innerText='⏳ Uploading PDF...';
-   let storageRef=firebase.storage().ref('letters/'+Date.now()+'_'+file.name);
-   await storageRef.put(file);
-   fileUrl=await storageRef.getDownloadURL();
-   fileName=file.name;
+   if(file.size>900*1024){alert("PDF too big! Max 900KB. Compress at smallpdf.com");return;}
+   document.getElementById('letStatus').innerText='⏳ Reading PDF...';
+   fileData = await new Promise((resolve,reject)=>{ let r=new FileReader(); r.onload=e=>resolve(e.target.result); r.onerror=reject; r.readAsDataURL(file); });
+   fileName=file.name; fileUrl="HAS_DATA";
   }
-  await db.collection('letters').add({Title:t,Body:b,Date:d,GradeTarget:g,FileUrl:fileUrl,FileName:fileName,Timestamp:Date.now()});
-  document.getElementById('letStatus').innerText='✅ Published! Parents can see it now.';
+  await db.collection('letters').add({Title:t,Body:b,Date:d,GradeTarget:g,FileUrl:fileUrl,FileName:fileName,FileData:fileData,Timestamp:Date.now()});
+  document.getElementById('letStatus').innerText='✅ Published! Parents can download now.';
   document.getElementById('letTitle').value='';document.getElementById('letBody').value='';document.getElementById('letFile').value='';document.getElementById('fileName').innerText='';
   loadLettersAdmin();
- }catch(e){document.getElementById('letStatus').innerText='❌ '+e.message; console.log(e);}
+ }catch(e){document.getElementById('letStatus').innerText='❌ '+e.message;}
 }
 document.getElementById('letFile').addEventListener('change',function(){
- if(this.files.length>0) document.getElementById('fileName').innerText='📄 Selected: '+this.files[0].name;
+ if(this.files.length>0){
+   let size = this.files[0].size;
+   if(size>900*1024){ document.getElementById('fileName').innerText='❌ Too big: '+(size/1024).toFixed(0)+'KB - Max 900KB'; document.getElementById('fileName').style.color='red'; }
+   else{ document.getElementById('fileName').innerText='📄 '+this.files[0].name+' ('+(size/1024).toFixed(0)+'KB) OK'; document.getElementById('fileName').style.color='green'; }
+ }
 });
 async function loadLettersAdmin(){
  let list=document.getElementById('lettersListAdmin');
@@ -144,15 +107,11 @@ async function loadLettersAdmin(){
   let snap=await db.collection('letters').orderBy('Timestamp','desc').get();
   document.getElementById('letterCount').innerText=snap.size;
   if(snap.empty){list.innerHTML='<div class=card>No letters yet</div>';return;}
-  let html='';
-  snap.forEach(doc=>{
-   let d=doc.data();
-   html+=`<div class="letter-card"><div style="font-size:11px;color:#800000">📅 ${d.Date} | ${d.GradeTarget}</div><div style="font-weight:900;color:#800000">${d.Title}</div><div style="font-size:13px;white-space:pre-wrap;margin:6px 0">${d.Body}</div>${d.FileUrl?`<a href="${d.FileUrl}" target="_blank" style="display:block;background:#800000;color:white;padding:10px;text-align:center;border-radius:8px;text-decoration:none;margin:8px 0;font-weight:bold">📥 Download PDF: ${d.FileName||'Letter.pdf'}</a>`:''}<button onclick="deleteLetter('${doc.id}')" class="btn btnRed" style="padding:6px;font-size:12px">🗑️ DELETE LETTER</button></div>`;
-  });
+  let html=''; snap.forEach(doc=>{ let d=doc.data(); let pdfBtn=''; if(d.FileData){ pdfBtn=`<a href="${d.FileData}" download="${d.FileName}" style="display:block;background:#800000;color:white;padding:10px;text-align:center;border-radius:8px;text-decoration:none;margin:8px 0;font-weight:bold">📥 DOWNLOAD PDF: ${d.FileName}</a>`; } html+=`<div class="letter-card"><div style="font-size:11px;color:#800000">📅 ${d.Date} | ${d.GradeTarget}</div><div style="font-weight:900;color:#800000">${d.Title}</div><div style="font-size:13px;white-space:pre-wrap;margin:6px 0">${d.Body}</div>${pdfBtn}<button onclick="deleteLetter('${doc.id}')" class="btn btnRed" style="padding:6px;font-size:12px">DELETE</button></div>`; });
   list.innerHTML=html;
- }catch(e){list.innerHTML='❌ Error: '+e.message;}
+ }catch(e){list.innerHTML='❌ '+e.message;}
 }
-async function deleteLetter(id){if(confirm('Delete this letter? Parents will no longer see it.')){await db.collection('letters').doc(id).delete(); loadLettersAdmin();}}
+async function deleteLetter(id){if(confirm('Delete this letter?')){await db.collection('letters').doc(id).delete(); loadLettersAdmin();}}
 loadLettersAdmin();
 </script>
 </body></html>
