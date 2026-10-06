@@ -4,12 +4,12 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <style>
 body{margin:0;background:#fdf8f5;font-family:Arial}
-.top{background:#800000;color:white;padding:12px;text-align:center;border-bottom:5px solid #ffd700;position:sticky;top:0;z-index:50}
+.top{background:#800000;color:black;padding:12px;text-align:center;border-bottom:5px solid #ffd700;position:sticky;top:0;z-index:50}
 .tabs{display:flex;background:#222;position:sticky;top:68px;z-index:100}
 .tabs button{flex:1;padding:12px 2px;border:0;color:white;font-weight:bold;font-size:10px;cursor:pointer}
 .tabs button.active{background:green}
 .tabContent{display:none}.tabContent.active{display:block}
-.card{background:white;margin:8px;padding:10px;border-radius:10px;box-shadow:0 2px 4px #999}
+.card{background:black;margin:8px;padding:10px;border-radius:10px;box-shadow:0 2px 4px #999}
 .btn{width:100%;padding:11px;border:0;border-radius:10px;font-weight:bold;color:white;cursor:pointer;margin-top:5px}
 .btnGreen{background:green}.btnGold{background:#ffd700;color:#800000;border:2px solid #800000}.btnRed{background:#d00}.btnOrange{background:orange}.btnBlue{background:#0f172a}
 #lockScreen{position:fixed;top:0;left:0;width:100%;height:100%;background:#800000;display:flex;align-items:center;justify-content:center;z-index:9999}
@@ -21,7 +21,7 @@ body{margin:0;background:#fdf8f5;font-family:Arial}
 </style>
 </head><body>
 
-<div id="lockScreen"><div class="lockBox"><h2 style="color:#800000;margin:0">🔒 DOOKA ADMIN</h2><p>Principal Only</p><input id="pwd" type="password" placeholder="Enter Password" style="width:100%;padding:12px;border:2px solid #800000;border-radius:8px;text-align:center;font-size:16px"><button class="btn btnGreen" onclick="checkPwd()">UNLOCK</button><small id="pwdErr" style="color:red;display:none">Wrong password!</small><br><small style="color:#888">Default: Dooka2026!</small><br><button onclick="localStorage.clear();location.reload()" style="margin-top:10px;font-size:10px;background:none;border:0;color:#888">Forgot? Logout</button></div></div>
+<div id="lockScreen"><div class="lockBox"><h2 style="color:#800000;margin:0">🔒 DOOKA ADMIN</h2><p>DOOKA ADMIN</p><input id="pwd" type="password" placeholder="Enter Password" style="width:100%;padding:12px;border:2px solid #800000;border-radius:8px;text-align:center;font-size:16px"><button class="btn btnGreen" onclick="checkPwd()">UNLOCK</button><small id="pwdErr" style="color:red;display:none">Wrong password!</small><br><small style="color:#888">Default: Dooka2026!</small><br><button onclick="localStorage.clear();location.reload()" style="margin-top:10px;font-size:10px;background:none;border:0;color:#888">Forgot? Logout</button></div></div>
 
 <div class="top"><h2 style="margin:0">DOOKA PRIMARY -  ADMIN</h2><small id="cnt">Loading...</small></div>
 <div class="tabs">
@@ -54,7 +54,7 @@ body{margin:0;background:#fdf8f5;font-family:Arial}
 </div>
 
 <script>
-const ADMIN_PASSWORD="Dooka2026!"; // CHANGE HERE
+const ADMIN_PASSWORD=600100319; // CHANGE HERE
 function checkPwd(){if(document.getElementById('pwd').value===ADMIN_PASSWORD){localStorage.setItem('dooka_admin_ok','yes');document.getElementById('lockScreen').style.display='none';}else{document.getElementById('pwdErr').style.display='block';}}
 if(localStorage.getItem('dooka_admin_ok')==='yes')document.getElementById('lockScreen').style.display='none';
 function showTab(t){document.querySelectorAll('.tabContent').forEach(c=>c.classList.remove('active'));document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));document.getElementById(t).classList.add('active');document.getElementById(t=='apps'?'b1':t=='approved'?'b2':t=='letters'?'b4':'b3').classList.add('active'); if(t=='letters') loadLettersAdmin();}
