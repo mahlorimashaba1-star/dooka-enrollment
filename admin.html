@@ -23,7 +23,7 @@ body{margin:0;background:#fdf8f5;font-family:Arial}
 
 <div id="lockScreen"><div class="lockBox"><h2 style="color:#800000;margin:0">🔒 DOOKA ADMIN</h2><p>Principal Only</p><input id="pwd" type="password" placeholder="Enter Password" style="width:100%;padding:12px;border:2px solid #800000;border-radius:8px;text-align:center;font-size:16px"><button class="btn btnGreen" onclick="checkPwd()">UNLOCK</button><small id="pwdErr" style="color:red;display:none">Wrong password!</small><br><small style="color:#888">Default: Dooka2026!</small><br><button onclick="localStorage.clear();location.reload()" style="margin-top:10px;font-size:10px;background:none;border:0;color:#888">Forgot? Logout</button></div></div>
 
-<div class="top"><h2 style="margin:0">DOOKA PRIMARY - SUPER ADMIN</h2><small id="cnt">Loading...</small></div>
+<div class="top"><h2 style="margin:0">DOOKA PRIMARY -  ADMIN</h2><small id="cnt">Loading...</small></div>
 <div class="tabs">
 <button id="b1" class="active" onclick="showTab('apps')">👨‍👩‍👧 PENDING <span id="appCount" style="background:red;padding:2px 6px;border-radius:10px">0</span></button>
 <button id="b2" onclick="showTab('approved')">✅ APPROVED <span id="approvedCount" style="background:green;padding:2px 6px;border-radius:10px">0</span></button>
