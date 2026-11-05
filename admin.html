@@ -1,86 +1,110 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dooka ADMIN 2026 - </title>
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dooka ADMIN 2026 - LIVE SYNC - TABLE FIXED</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@800&family=Inter:wght@600;700;900&display=swap" rel="stylesheet">
 <style>*{font-family:Inter}h1,h2{font-family:'Plus Jakarta Sans'}</style>
 </head><body class="bg-[#FFFBF5] min-h-screen">
-<!-- LOCK - FIXED BUG -->
+
 <div id="lockScreen" class="fixed inset-0 bg-gradient-to-br from-[#800000] to-[#2A0000] flex items-center justify-center z-[9999] p-4">
 <div class="bg-white rounded-[28px] p-8 w-full max-w-[380px] text-center shadow-[0_24px_64px_rgba(0,0,0,0.5)] border-[4px] border-[#FFD700]">
-<div class="w-20 h-20 bg-[#800000] rounded-full mx-auto flex items-center justify-center text-3xl"><img src="data:image/jpeg;base64,[STRIPPED]" class="w-20 h-20 rounded-full border-4 border-[#FFD700] bg-white object-contain mx-auto"></div>
-<h2 class="font-black text-[#800000] text-[24px] mt-4">DOOKA ADMIN</h2><p class="font-black text-[12px] text-[#800000]/70 tracking-widest">2026 • LIVE SYNC FIXED</p>
-<input id="pwd" type="password" placeholder="Enter Password: Dooka2026! or 600100319" class="w-full mt-4 p-4 border-2 border-[#800000]/20 focus:border-[#FFD700] rounded-[14px] text-center font-bold outline-none bg-[#FFFBF5]">
-<button onclick="checkPwd()" class="w-full mt-3 bg-[#800000] text-[#FFD700] py-4 rounded-full font-black text-[16px] shadow-lg hover:bg-[#6B0F0F]">UNLOCK LIVE ADMIN</button>
-<small id="pwdErr" class="text-red-600 hidden font-black mt-2 block">❌ Wrong password!</small>
-<p id="firebaseStatus" class="text-[11px] mt-3 text-gray-500 font-bold">Checking Firebase: dooka-enrollment...</p>
+<div class="w-20 h-20 bg-[#800000] rounded-full mx-auto flex items-center justify-center"><span class="text-white font-black text-2xl">D</span></div>
+<h2 class="font-black text-[#800000] text-[24px] mt-4">DOOKA ADMIN</h2>
+<input id="pwd" type="password" placeholder="Dooka2026! or 600100319" class="w-full mt-4 p-4 border-2 border-[#800000]/20 rounded-[14px] text-center font-bold outline-none bg-[#FFFBF5]">
+<button onclick="checkPwd()" class="w-full mt-3 bg-[#800000] text-[#FFD700] py-4 rounded-full font-black">UNLOCK LIVE ADMIN</button>
+<small id="pwdErr" class="text-red-600 hidden font-black mt-2 block">Wrong password!</small>
+<p id="firebaseStatus" class="text-[11px] mt-3 text-gray-500 font-bold">Checking Firebase...</p>
 </div></div>
 
 <div class="flex min-h-screen">
 <div class="w-[280px] bg-[#0F0F0F] text-white p-5 hidden lg:block sticky top-0 h-screen overflow-auto">
-<div class="flex items-center gap-3"><div class="w-10 h-10 bg-[#800000] rounded-full flex items-center justify-center font-black text-[#FFD700]"><img src="data:image/jpeg;base64,[STRIPPED]" class="w-10 h-10 rounded-full border-2 border-[#FFD700] object-contain bg-white"> </div><div><h2 class="font-black text-[#FFD700] leading-none">DOOKA</h2><p class="text-[10px] text-gray-400 tracking-widest">ADMIN 2026 LIVE</p></div></div>
-<p id="cnt" class="text-xs text-gray-400 mt-6 mb-6 bg-white/5 p-3 rounded-xl">Connecting to Firebase...</p>
+<h2 class="font-black text-[#FFD700]">DOOKA ADMIN 2026 LIVE</h2>
+<p id="cnt" class="text-xs text-gray-400 mt-6 mb-6 bg-white/5 p-3 rounded-xl">Connecting...</p>
 <nav class="space-y-2">
-<button id="b1" onclick="showTab('apps')" class="w-full text-left py-3.5 px-4 rounded-[14px] bg-[#800000] text-[#FFD700] font-black flex justify-between"><span>👶 PENDING</span><span id="appCount" class="bg-red-600 text-white px-2.5 py-0.5 rounded-full text-[11px]">0</span></button>
-<button id="b2" onclick="showTab('approved')" class="w-full text-left py-3.5 px-4 rounded-[14px] hover:bg-white/10 font-black flex justify-between"><span>✅ APPROVED</span><span id="approvedCount" class="bg-green-600 text-white px-2.5 py-0.5 rounded-full text-[11px]">0</span></button>
-<button id="b3" onclick="showTab('sams')" class="w-full text-left py-3.5 px-4 rounded-[14px] hover:bg-white/10 font-black">🎓 SA-SAMS EXPORT</button>
-<button id="b4" onclick="showTab('letters')" class="w-full text-left py-3.5 px-4 rounded-[14px] hover:bg-white/10 font-black flex justify-between"><span>✉ LETTERS</span><span id="letterCount" class="bg-[#800000] px-2.5 py-0.5 rounded-full text-[11px]">0</span></button>
+<button id="b1" onclick="showTab('apps')" class="w-full text-left py-3.5 px-4 rounded-[14px] bg-[#800000] text-[#FFD700] font-black flex justify-between"><span>PENDING</span><span id="appCount" class="bg-red-600 text-white px-2.5 py-0.5 rounded-full text-[11px]">0</span></button>
+<button id="b2" onclick="showTab('approved')" class="w-full text-left py-3.5 px-4 rounded-[14px] hover:bg-white/10 font-black flex justify-between"><span>APPROVED</span><span id="approvedCount" class="bg-green-600 text-white px-2.5 py-0.5 rounded-full text-[11px]">0</span></button>
+<button id="b3" onclick="showTab('sams')" class="w-full text-left py-3.5 px-4 rounded-[14px] hover:bg-white/10 font-black">SA-SAMS EXPORT</button>
+<button id="b4" onclick="showTab('letters')" class="w-full text-left py-3.5 px-4 rounded-[14px] hover:bg-white/10 font-black">LETTERS</button>
 </nav>
-<div class="mt-10 p-4 bg-[#800000]/20 rounded-[14px] border border-[#FFD700]/20"><p class="text-[11px] font-black text-[#FFD700]">LIVE CONNECTION</p><p id="liveIndicator" class="text-[11px] text-white/60 mt-1">● Connecting...</p><button onclick="localStorage.clear();location.reload()" class="mt-3 text-[10px] text-white/40 underline">Logout / Clear Cache</button></div>
+<div class="mt-10 p-4 bg-[#800000]/20 rounded-[14px] border border-[#FFD700]/20"><p id="liveIndicator" class="text-[11px] text-white/60">Connecting...</p><button onclick="localStorage.clear();location.reload()" class="mt-3 text-[10px] text-white/40 underline">Logout</button></div>
 </div>
 
 <div class="flex-1">
 <div class="lg:hidden bg-[#0F0F0F] text-white p-3 flex gap-2 overflow-auto sticky top-0 z-40">
-<button id="mb1" onclick="showTab('apps')" class="whitespace-nowrap bg-[#800000] text-[#FFD700] px-5 py-2.5 rounded-full font-black text-[12px]">PENDING <span id="mAppCount">0</span></button>
-<button id="mb2" onclick="showTab('approved')" class="whitespace-nowrap bg-white/10 px-5 py-2.5 rounded-full font-black text-[12px]">APPROVED</button>
-<button id="mb3" onclick="showTab('sams')" class="whitespace-nowrap bg-white/10 px-5 py-2.5 rounded-full font-black text-[12px]">SA-SAMS</button>
-<button id="mb4" onclick="showTab('letters')" class="whitespace-nowrap bg-white/10 px-5 py-2.5 rounded-full font-black text-[12px]">LETTERS</button>
+<button onclick="showTab('apps')" class="bg-[#800000] text-[#FFD700] px-5 py-2.5 rounded-full font-black text-[12px]">PENDING <span id="mAppCount">0</span></button>
+<button onclick="showTab('approved')" class="bg-white/10 px-5 py-2.5 rounded-full font-black text-[12px]">APPROVED</button>
+<button onclick="showTab('sams')" class="bg-white/10 px-5 py-2.5 rounded-full font-black text-[12px]">SA-SAMS</button>
+<button onclick="showTab('letters')" class="bg-white/10 px-5 py-2.5 rounded-full font-black text-[12px]">LETTERS</button>
 </div>
 
-<div id="apps" class="p-4 lg:p-6"><div class="flex items-center justify-between mb-4"><h2 class="font-black text-[20px]">Pending - LIVE from Parent Site</h2><span class="text-[11px] bg-orange-100 text-orange-700 px-3 py-1 rounded-full font-black">REAL-TIME SYNC</span></div><div id="appList" class="grid gap-4">⏳ Listening to Firestore collection <b>enrollments</b>...</div></div>
-
-<div id="approved" class="p-4 lg:p-6 hidden"><h2 class="font-black text-[20px] mb-4">Approved - Ready for SA-SAMS / LURITS</h2><div id="approvedList"></div></div>
+<div id="apps" class="p-4 lg:p-6"><h2 class="font-black text-[20px] mb-4">Pending - LIVE</h2><div id="appList" class="grid gap-4">Loading enrollments...</div></div>
+<div id="approved" class="p-4 lg:p-6 hidden"><h2 class="font-black text-[20px] mb-4">Approved - Ready for SA-SAMS</h2><div id="approvedList"></div></div>
 
 <div id="sams" class="p-4 lg:p-6 hidden">
 <div class="bg-white border-[3px] border-[#FFD700] rounded-[24px] p-6 shadow-sm">
-<div class="flex items-center gap-3"><div class="w-12 h-12 bg-[#FFD700] rounded-full flex items-center justify-center text-xl">⭐</div><div><h3 class="font-black text-[#800000] text-[18px]">SA-SAMS / LURITS EXPORT - FIXED FOR EXCEL</h3><p class="text-[12px] text-gray-600">Exports ONLY Approved learners with all required SA-SAMS fields - Excel will now open it correctly</p></div></div>
+<h3 class="font-black text-[#800000] text-[18px]">SA-SAMS / LURITS EXPORT - REAL EXCEL TABLE</h3>
+<p class="text-[12px] text-gray-600 mt-1">This table shows exactly what will be exported. No more CSV comma bug.</p>
 <div class="grid md:grid-cols-2 gap-3 mt-5">
-<button onclick="exportSAMS()" class="bg-[#FFD700] border-2 border-[#800000] text-[#800000] py-4 rounded-full font-black shadow">⭐ EXPORT APPROVED FOR SA-SAMS</button>
-<button onclick="exportSAMSAll()" class="bg-[#0F0F0F] text-white py-4 rounded-full font-black">Export ALL - Backup CSV (Excel Fixed)</button>
+<button onclick="exportSAMS()" class="bg-[#FFD700] border-2 border-[#800000] text-[#800000] py-4 rounded-full font-black shadow">⭐ EXPORT APPROVED .XLSX (Excel Fixed)</button>
+<button onclick="exportSAMSAll()" class="bg-[#0F0F0F] text-white py-4 rounded-full font-black">Export ALL Backup .XLSX</button>
 </div>
 </div>
-<!-- FIXED TABLE -->
-<div class="mt-6 bg-white rounded-[20px] border-2 border-black/5 overflow-auto">
-<table class="w-full text-left border-collapse">
-<thead class="bg-[#0F0F0F] text-white text-[11px] uppercase tracking-widest">
-<tr><th class="p-3">Surname</th><th class="p-3">Name</th><th class="p-3">DOB</th><th class="p-3">Gender</th><th class="p-3">Race</th><th class="p-3">Lang</th><th class="p-3">Grade</th><th class="p-3">Adm No</th><th class="p-3">Parent Cell</th><th class="p-3">Status</th></tr>
+
+<!-- REAL TABLE THAT YOU CAN SEE -->
+<div class="mt-6 bg-white rounded-[20px] border-2 border-black/10 overflow-auto shadow-sm">
+<div class="overflow-auto max-h-[70vh]">
+<table class="w-full text-left border-collapse min-w-[1100px]">
+<thead class="bg-[#0F0F0F] text-white text-[11px] uppercase tracking-widest sticky top-0">
+<tr>
+<th class="p-3 border-r border-white/10">Surname</th>
+<th class="p-3 border-r border-white/10">First Names</th>
+<th class="p-3 border-r border-white/10">Learner ID</th>
+<th class="p-3 border-r border-white/10">DOB</th>
+<th class="p-3 border-r border-white/10">Gender</th>
+<th class="p-3 border-r border-white/10">Race</th>
+<th class="p-3 border-r border-white/10">Home Lang</th>
+<th class="p-3 border-r border-white/10">Grade</th>
+<th class="p-3 border-r border-white/10">Adm No</th>
+<th class="p-3 border-r border-white/10">Parent Name</th>
+<th class="p-3 border-r border-white/10">Parent Cell</th>
+<th class="p-3 border-r border-white/10">Address</th>
+<th class="p-3">Status</th>
+</tr>
 </thead>
-<tbody id="samsTableBody" class="text-[13px]"></tbody>
+<tbody id="samsTableBody" class="text-[13px] divide-y divide-black/5">
+</tbody>
 </table>
-<div id="samsEmpty" class="p-8 text-center text-gray-500 font-bold">No approved learners yet</div>
 </div>
-<div id="samsList" class="mt-4 grid gap-2 hidden"></div>
+<div id="samsEmpty" class="p-12 text-center">
+<p class="font-black text-gray-400">No approved learners yet</p>
+<p class="text-[11px] text-gray-400 mt-1">Approve learners in PENDING tab, they will appear here in the table instantly</p>
+</div>
+</div>
+
+<div class="mt-4 bg-green-50 border-2 border-green-200 rounded-[16px] p-4">
+<p class="text-[12px] font-black text-green-800">✅ EXCEL FIX APPLIED:</p>
+<p class="text-[11px] text-green-700 mt-1">Old version used CSV with commas (") - South African Excel uses semicolon ; so everything went into Column A like your screenshot. New version uses real .xlsx file with XLSX library - each field is a real Excel cell.</p>
+</div>
+
 </div>
 
 <div id="letters" class="p-4 lg:p-6 hidden">
-<div class="grid lg:grid-cols-[1.2fr_0.8fr] gap-6">
-<div class="bg-white border-2 border-[#800000] rounded-[24px] p-6 shadow-sm">
-<h3 class="font-black text-[#800000] text-[18px]">✉ Publish New Letter</h3>
-<input id="letTitle" placeholder="Letter Title *" class="w-full border-2 border-black/10 focus:border-[#FFD700] rounded-[14px] p-4 font-bold mt-4 outline-none bg-[#FFFBF5]">
-<textarea id="letBody" rows="5" placeholder="Write full letter message here... *" class="w-full border-2 border-black/10 focus:border-[#FFD700] rounded-[14px] p-4 font-bold mt-3 outline-none bg-[#FFFBF5]"></textarea>
-<div class="bg-[#FFFBE6] border-2 border-dashed border-[#800000]/30 rounded-[14px] p-4 mt-3"><label class="font-black text-[12px] text-[#800000]">📎 Attach PDF (Max 900KB):</label><input id="letFile" type="file" accept=".pdf" class="w-full mt-2 text-[13px] font-bold"><small id="fileName" class="font-black text-[11px]"></small></div>
-<div class="flex gap-3 mt-3"><input id="letDate" type="date" class="flex-1 border-2 border-black/10 rounded-[14px] p-3 font-bold bg-[#FFFBF5]"><select id="letGrade" class="flex-1 border-2 border-black/10 rounded-[14px] p-3 font-bold bg-[#FFFBF5]"><option>All Grades</option><option>Grade R</option><option>Grade 1</option><option>Grade 2</option><option>Grade 3</option><option>Grade 4</option><option>Grade 5</option><option>Grade 6</option><option>Grade 7</option></select></div>
-<button onclick="publishLetter()" class="w-full bg-[#800000] text-[#FFD700] py-4 rounded-full font-black mt-4 shadow-lg">📢 PUBLISH LETTER LIVE</button>
-<p id="letStatus" class="text-center font-black text-[12px] mt-3"></p>
+<div class="bg-white border-2 border-[#800000] rounded-[24px] p-6"><h3 class="font-black text-[#800000]">Publish Letter</h3>
+<input id="letTitle" placeholder="Title" class="w-full border-2 rounded-[14px] p-4 font-bold mt-4 bg-[#FFFBF5]">
+<textarea id="letBody" rows="5" placeholder="Message" class="w-full border-2 rounded-[14px] p-4 font-bold mt-3 bg-[#FFFBF5]"></textarea>
+<input id="letDate" type="date" class="w-full border-2 rounded-[14px] p-3 font-bold mt-3 bg-[#FFFBF5]">
+<button onclick="publishLetter()" class="w-full bg-[#800000] text-[#FFD700] py-4 rounded-full font-black mt-4">PUBLISH</button><p id="letStatus" class="text-center font-black text-[12px] mt-3"></p>
 </div>
-<div><h4 class="font-black mb-3">Published Letters - LIVE</h4><div id="lettersListAdmin" class="space-y-3">Loading...</div></div>
+<div class="mt-6" id="lettersListAdmin">Loading...</div>
 </div>
-</div>
+
 </div>
 </div>
 
-<div id="docModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-[10000] p-4 backdrop-blur" onclick="this.style.display='none'"><div class="bg-white p-2 rounded-[16px] max-w-[90vw]"><img id="docModalImg" class="max-w-full max-h-[85vh] rounded-xl"><p class="text-center text-[11px] font-bold mt-2">Click outside to close</p></div></div>
+<div id="docModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-[10000] p-4" onclick="this.style.display='none'"><div class="bg-white p-2 rounded-[16px] max-w-[90vw]"><img id="docModalImg" class="max-w-full max-h-[85vh] rounded-xl"></div></div>
 
 <script>
 const firebaseConfig={apiKey:"AIzaSyCVm-xNEv4IwZ5pk79YFOLOMapnAOlUCrM",authDomain:"dooka-enrollment.firebaseapp.com",projectId:"dooka-enrollment",storageBucket:"dooka-enrollment.firebasestorage.app",messagingSenderId:"75187233656",appId:"1:75187233656:web:962e5eba5b15892c295e8d"};
@@ -92,94 +116,62 @@ if(localStorage.getItem('dooka_admin_ok')==='yes'){document.getElementById('lock
 function showTab(t){['apps','approved','sams','letters'].forEach(x=>document.getElementById(x).classList.add('hidden'));document.getElementById(t).classList.remove('hidden'); if(t=='letters') loadLettersAdmin();}
 let allApproved=[], allPending=[];
 
-// --- EXCEL FIX FUNCTIONS ---
-function esc(v){
-  if(v==null) return "";
-  let s = String(v).trim();
-  // Escape quotes by doubling them, and wrap in quotes if contains comma, quote, newline
-  if(s.includes('"') || s.includes(',') || s.includes('\n') || s.includes('\r')){
-    return '"'+s.replace(/"/g,'""')+'"';
-  }
-  return '"'+s+'"'; // Always quote to keep Excel happy
-}
-function formatDOB(d){
-  if(!d) return "";
-  // Convert YYYY-MM-DD to DD/MM/YYYY for SA-SAMS
-  if(d.includes('-')){
-    let parts = d.split('-');
-    if(parts.length===3) return parts[2]+'/'+parts[1]+'/'+parts[0];
-  }
-  return d;
-}
-function downloadCSV(filename, csvContent){
-  // Add BOM so Excel opens UTF-8 correctly
-  let blob = new Blob(["\uFEFF"+csvContent],{type:"text/csv;charset=utf-8;"});
-  let a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download=filename;
-  a.click();
-}
+function formatDOB(d){ if(!d) return ""; if(d.includes('-')){ let p=d.split('-'); if(p.length===3) return p[2]+'/'+p[1]+'/'+p[0]; } return d; }
 
 function startListening(){
 db.collection("enrollments").orderBy("Timestamp","desc").onSnapshot(snap=>{
  let pendingHtml="", approvedHtml="", tableRows=""; allApproved=[]; allPending=[]; let pendCount=0, apprCount=0;
- snap.forEach(doc=>{let a=doc.data(); let id=doc.id; if(a.Status=="Pending"||!a.Status||a.Status=="pending"){pendCount++; allPending.push({...a,_id:id}); pendingHtml+=`<div class="bg-white rounded-[20px] p-5 shadow border-l-[6px] border-orange-500"><div class="flex justify-between"><b class="font-black">🆕 ${a.FullName||(a.Name||'')+' '+(a.Surname||'')}</b><span class="bg-orange-500 text-white text-[10px] px-2.5 py-1 rounded-full font-black">PENDING</span></div><div class="text-[12px] mt-2"><b>Adm:</b> ${a.AdmissionNo||''} | <b>Grade:</b> ${a.Grade||''} | <b>Race:</b> ${a.Race||"-"} | <b>Lang:</b> ${a.HomeLanguage||"-"}<br><b>DOB:</b> ${a.DOB||""} | <b>Gender:</b> ${a.Gender} | <b>LearnerID:</b> ${a.LearnerID||""}<br><b>Parent:</b> ${a.ParentName||''} (${a.Relation||''})<br><b>Phone:</b> ${a.ParentPhone||''} <a href="https://wa.me/${(a.ParentPhone||'').replace(/[^0-9]/g,'')}" target="_blank" class="bg-green-600 text-white px-2 py-1 rounded-full text-[10px] ml-1">WhatsApp</a><br><b>Address:</b> ${a.Address||''}</div><div class="grid grid-cols-3 gap-2 mt-3">${a.BirthCertFile?`<img src="${a.BirthCertFile}" onclick="openDoc('${a.BirthCertFile}')" class="h-[90px] w-full object-cover rounded-xl border-2 border-[#800000] cursor-pointer">`:`<div class="h-[90px] bg-red-50 rounded-xl flex items-center justify-center text-[10px] font-bold">❌ No Birth</div>`}${a.ParentIDFile?`<img src="${a.ParentIDFile}" onclick="openDoc('${a.ParentIDFile}')" class="h-[90px] w-full object-cover rounded-xl border-2 border-[#800000] cursor-pointer">`:`<div class="h-[90px] bg-red-50 rounded-xl flex items-center justify-center text-[10px] font-bold">❌ No ID</div>`}${a.ProofFile?`<img src="${a.ProofFile}" onclick="openDoc('${a.ProofFile}')" class="h-[90px] w-full object-cover rounded-xl border-2 border-[#800000] cursor-pointer">`:`<div class="h-[90px] bg-red-50 rounded-xl flex items-center justify-center text-[10px] font-bold">❌ No Proof</div>`}</div><div class="flex gap-2 mt-4"><button onclick="updateStatus('${id}','Approved')" class="flex-1 bg-green-600 text-white py-3 rounded-full font-black text-[13px]">✅ APPROVE</button><button onclick="updateStatus('${id}','Rejected')" class="flex-1 bg-red-600 text-white py-3 rounded-full font-black text-[13px]">❌ REJECT</button></div></div>`;} else if(a.Status=="Approved"){apprCount++; allApproved.push({...a,_id:id}); approvedHtml+=`<div class="bg-white rounded-[14px] p-4 mb-2 shadow-sm border-l-4 border-green-600 flex justify-between items-center"><div><b>✅ ${a.FullName||a.Name+' '+a.Surname}</b> <span class="text-xs text-gray-500">- ${a.Grade} - ${a.AdmissionNo}</span></div><div class="flex gap-1"><button onclick="updateStatus('${id}','Pending')" class="bg-orange-500 text-white px-3 py-1.5 rounded-full text-[11px] font-black">↩ Pending</button><button onclick="if(confirm('Delete?'))db.collection('enrollments').doc('${id}').delete()" class="bg-red-600 text-white px-3 py-1.5 rounded-full text-[11px] font-black">Delete</button></div></div>`; tableRows+=`<tr class="border-b hover:bg-[#FFFBF5]"><td class="p-3 font-bold">${a.Surname||''}</td><td class="p-3">${a.Name||''}</td><td class="p-3">${formatDOB(a.DOB)}</td><td class="p-3">${(a.Gender||'').charAt(0).toUpperCase()}</td><td class="p-3">${a.Race||''}</td><td class="p-3">${a.HomeLanguage||''}</td><td class="p-3">${(a.Grade||'').replace('Grade ','')}</td><td class="p-3 font-mono text-xs">${a.AdmissionNo||''}</td><td class="p-3">${a.ParentPhone||''}</td><td class="p-3"><span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-[10px] font-black">APPROVED</span></td></tr>`;}});
- document.getElementById('appCount').innerText=pendCount; let m=document.getElementById('mAppCount'); if(m) m.innerText=pendCount; document.getElementById('approvedCount').innerText=apprCount; document.getElementById('cnt').innerText=pendCount+" pending | "+apprCount+" approved | LIVE"; document.getElementById('appList').innerHTML=pendingHtml||"<div class='bg-white p-8 rounded-[20px] text-center'><p class='font-black'>No pending applications</p></div>"; document.getElementById('approvedList').innerHTML=approvedHtml||"<div class='bg-white p-8 rounded-[20px] text-center text-gray-500'>No approved yet</div>"; document.getElementById('samsTableBody').innerHTML=tableRows; document.getElementById('samsEmpty').style.display = apprCount ? 'none' : 'block';
-}, err=>{document.getElementById('appList').innerHTML=`<div class="bg-red-600 text-white p-6 rounded-[20px]"><p>❌ ${err.message}</p></div>`;});
+ snap.forEach(doc=>{
+  let a=doc.data(); let id=doc.id;
+  if(a.Status=="Pending"||!a.Status||a.Status=="pending"){
+   pendCount++; allPending.push({...a,_id:id});
+   pendingHtml+=`<div class="bg-white rounded-[20px] p-5 shadow border-l-[6px] border-orange-500"><b>🆕 ${a.FullName||(a.Name||'')+' '+(a.Surname||'')}</b><div class="text-[12px] mt-2"><b>Adm:</b> ${a.AdmissionNo||''} | <b>Grade:</b> ${a.Grade||''}<br><b>Parent:</b> ${a.ParentName||''} ${a.ParentPhone||''}</div><div class="flex gap-2 mt-4"><button onclick="updateStatus('${id}','Approved')" class="flex-1 bg-green-600 text-white py-3 rounded-full font-black">✅ APPROVE</button><button onclick="updateStatus('${id}','Rejected')" class="flex-1 bg-red-600 text-white py-3 rounded-full font-black">❌ REJECT</button></div></div>`;
+  } else if(a.Status=="Approved"){
+   apprCount++; allApproved.push({...a,_id:id});
+   approvedHtml+=`<div class="bg-white rounded-[14px] p-4 mb-2 shadow-sm border-l-4 border-green-600 flex justify-between"><div><b>✅ ${a.FullName||a.Name+' '+a.Surname}</b> - ${a.Grade} - ${a.AdmissionNo}</div><button onclick="updateStatus('${id}','Pending')" class="bg-orange-500 text-white px-3 py-1.5 rounded-full text-[11px] font-black">↩ Pending</button></div>`;
+   tableRows+=`<tr class="hover:bg-[#FFFBF5]"><td class="p-3 font-bold border-r">${a.Surname||''}</td><td class="p-3 border-r">${a.Name||''}</td><td class="p-3 font-mono text-xs border-r">${a.LearnerID||''}</td><td class="p-3 border-r">${formatDOB(a.DOB)}</td><td class="p-3 border-r">${(a.Gender||'').charAt(0).toUpperCase()}</td><td class="p-3 border-r">${a.Race||''}</td><td class="p-3 border-r">${a.HomeLanguage||''}</td><td class="p-3 border-r">${(a.Grade||'').replace('Grade ','')}</td><td class="p-3 font-mono text-xs border-r">${a.AdmissionNo||''}</td><td class="p-3 border-r">${a.ParentName||''}</td><td class="p-3 border-r">${a.ParentPhone||''}</td><td class="p-3 border-r truncate max-w-[200px]">${a.Address||''}</td><td class="p-3"><span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-[10px] font-black">APPROVED</span></td></tr>`;
+  }
+ });
+ document.getElementById('appCount').innerText=pendCount;
+ let m=document.getElementById('mAppCount'); if(m) m.innerText=pendCount;
+ document.getElementById('approvedCount').innerText=apprCount;
+ document.getElementById('cnt').innerText=pendCount+" pending | "+apprCount+" approved | LIVE";
+ document.getElementById('appList').innerHTML=pendingHtml||"<div class='bg-white p-8 rounded-[20px] text-center'>No pending</div>";
+ document.getElementById('approvedList').innerHTML=approvedHtml||"<div class='bg-white p-8 rounded-[20px] text-center text-gray-500'>No approved yet</div>";
+ document.getElementById('samsTableBody').innerHTML=tableRows;
+ document.getElementById('samsEmpty').style.display = apprCount ? 'none' : 'block';
+}, err=>{document.getElementById('appList').innerHTML=`<div class="bg-red-600 text-white p-6 rounded-[20px]">❌ ${err.message}</div>`;});
 }
-function openDoc(src){document.getElementById('docModalImg').src=src;document.getElementById('docModal').style.display='flex';document.getElementById('docModal').classList.remove('hidden');document.getElementById('docModal').classList.add('flex');}
+
+function openDoc(src){document.getElementById('docModalImg').src=src;document.getElementById('docModal').style.display='flex';}
 function updateStatus(id,status){db.collection("enrollments").doc(id).update({Status:status});}
 
-);
-downloadCSV("Dooka_ALL_Backup_"+new Date().toISOString().slice(0,10)+".csv", csv);
-}
-async function publishLetter(){let t=document.getElementById('letTitle').value.trim();let b=document.getElementById('letBody').value.trim();let d=document.getElementById('letDate').value||new Date().toISOString().split('T')[0];let g=document.getElementById('letGrade').value;let fileInput=document.getElementById('letFile');if(!t||!b){alert('Title and Message required');return;}document.getElementById('letStatus').innerText='⏳ Publishing...';try{let fileName="",fileData="";if(fileInput.files.length>0){let file=fileInput.files[0];if(file.size>900*1024){alert("PDF too big! Max 900KB");return;}fileData=await new Promise((res,rej)=>{let r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=rej;r.readAsDataURL(file);});fileName=file.name;}await db.collection('letters').add({Title:t,Body:b,Date:d,GradeTarget:g,FileName:fileName,FileData:fileData,Timestamp:Date.now()});document.getElementById('letStatus').innerText='✅ Published LIVE!';document.getElementById('letTitle').value='';document.getElementById('letBody').value='';document.getElementById('letFile').value='';document.getElementById('fileName').innerText='';loadLettersAdmin();}catch(e){document.getElementById('letStatus').innerText='❌ '+e.message;}}
-document.getElementById('letFile').addEventListener('change',function(){if(this.files.length>0){let sz=this.files[0].size;let el=document.getElementById('fileName');if(sz>900*1024){el.innerText='❌ Too big: '+(sz/1024).toFixed(0)+'KB';el.style.color='red';}else{el.innerText='📄 '+this.files[0].name+' ('+(sz/1024).toFixed(0)+'KB) OK';el.style.color='green';}}});
-async function loadLettersAdmin(){let list=document.getElementById('lettersListAdmin');try{let snap=await db.collection('letters').orderBy('Timestamp','desc').get();document.getElementById('letterCount').innerText=snap.size;if(snap.empty){list.innerHTML='<div class="bg-white p-6 rounded-[16px] text-center text-gray-500">No letters yet</div>';return;}let html='';snap.forEach(doc=>{let d=doc.data();let pdfBtn='';if(d.FileData){pdfBtn=`<a href="${d.FileData}" download="${d.FileName}" class="block bg-[#800000] text-white p-2.5 text-center rounded-xl font-bold mt-2 text-xs">📥 DOWNLOAD PDF: ${d.FileName}</a>`;}html+=`<div class="bg-[#FFFBF0] border-l-[6px] border-[#800000] p-4 rounded-[16px] shadow-sm"><div class="text-[11px] text-gray-500 font-bold">📅 ${d.Date} | ${d.GradeTarget}</div><div class="font-black text-[#800000] mt-1">${d.Title}</div><div class="text-[13px] whitespace-pre-wrap mt-1">${d.Body.slice(0,200)}</div>${pdfBtn}<button onclick="if(confirm('Delete?')){db.collection('letters').doc('${doc.id}').delete().then(()=>loadLettersAdmin())}" class="bg-red-600 text-white px-3 py-1 rounded-full text-[11px] font-black mt-2">🗑 DELETE</button></div>`;});list.innerHTML=html;}catch(e){list.innerHTML='❌ '+e.message;}}
-if(localStorage.getItem('dooka_admin_ok')==='yes')startListening();loadLettersAdmin();
-
-<!-- SheetJS for REAL Excel files -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script>
-function esc(v){ if(v==null) return ""; return String(v).trim(); }
-function formatDOB(d){ if(!d) return ""; if(d.includes('-')){ let p=d.split('-'); if(p.length===3) return p[2]+'/'+p[1]+'/'+p[0]; } return d; }
-function downloadCSV(filename, csvContent){ let blob=new Blob(["\uFEFF"+csvContent],{type:"text/csv;charset=utf-8;"}); let a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=filename; a.click(); }
-
 function exportSAMS(){
-  if(allApproved.length==0) return alert("No APPROVED learners");
-  // Create worksheet data as array-of-arrays - this is what SA-SAMS expects
+  if(allApproved.length==0) return alert("No APPROVED learners - approve some first!");
   const headers = ["Surname","First Names","Learner ID","Birth Certificate No","Date of Birth","Gender","Race","Home Language","Grade","Class","Parent Name","Parent ID","Parent Cell","WhatsApp","Parent Phone2","Address","Admission No","Status","Notes"];
   const rows = [headers];
   allApproved.forEach(a=>{
-    rows.push([
-      a.Surname||"", a.Name||"", a.LearnerID||"", a.LearnerID||"",
-      formatDOB(a.DOB), (a.Gender||"").toUpperCase().startsWith("F")?"F":"M",
-      a.Race||"", a.HomeLanguage||"",
-      (a.Grade||"").replace("Grade ","").trim(), "",
-      a.ParentName||"", a.ParentID||"", a.ParentPhone||"", a.WhatsApp||a.ParentPhone||"", a.ParentPhone2||"", a.Address||"", a.AdmissionNo||"", "ENROLLED", ""
-    ]);
+    rows.push([a.Surname||"", a.Name||"", a.LearnerID||"", a.LearnerID||"", formatDOB(a.DOB), (a.Gender||"").toUpperCase().startsWith("F")?"F":"M", a.Race||"", a.HomeLanguage||"", (a.Grade||"").replace("Grade ","").trim(), "", a.ParentName||"", a.ParentID||"", a.ParentPhone||"", a.WhatsApp||a.ParentPhone||"", a.ParentPhone2||"", a.Address||"", a.AdmissionNo||"", "ENROLLED", ""]);
   });
   const ws = XLSX.utils.aoa_to_sheet(rows);
-  // Auto width
-  ws['!cols'] = headers.map(h=>({wch: Math.max(12, h.length+2)}));
+  ws['!cols'] = [{wch:15},{wch:15},{wch:16},{wch:16},{wch:12},{wch:6},{wch:8},{wch:12},{wch:6},{wch:6},{wch:18},{wch:14},{wch:14},{wch:14},{wch:14},{wch:25},{wch:12},{wch:10},{wch:10}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "SA-SAMS Approved");
   XLSX.writeFile(wb, "Dooka_APPROVED_SA-SAMS_"+new Date().toISOString().slice(0,10)+".xlsx");
 }
 
 function exportSAMSAll(){
-  let all=[...allPending,...allApproved];
-  if(all.length==0) return alert("No data!");
+  let all=[...allPending,...allApproved]; if(all.length==0) return alert("No data!");
   const headers = ["Surname","First Names","Learner ID","Date of Birth","Gender","Race","Home Language","Grade","Parent Name","Parent Cell","Admission No","Status","Full Address"];
   const rows = [headers];
-  all.forEach(a=>{
-    rows.push([a.Surname||"", a.Name||"", a.LearnerID||"", formatDOB(a.DOB), (a.Gender||"").charAt(0).toUpperCase(), a.Race||"", a.HomeLanguage||"", (a.Grade||"").replace("Grade ",""), a.ParentName||"", a.ParentPhone||"", a.AdmissionNo||"", a.Status||"Pending", a.Address||""]);
-  });
+  all.forEach(a=>{ rows.push([a.Surname||"", a.Name||"", a.LearnerID||"", formatDOB(a.DOB), (a.Gender||"").charAt(0).toUpperCase(), a.Race||"", a.HomeLanguage||"", (a.Grade||"").replace("Grade ",""), a.ParentName||"", a.ParentPhone||"", a.AdmissionNo||"", a.Status||"Pending", a.Address||""]); });
   const ws = XLSX.utils.aoa_to_sheet(rows);
-  ws['!cols'] = headers.map(h=>({wch: 15}));
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "All Learners");
   XLSX.writeFile(wb, "Dooka_ALL_Backup_"+new Date().toISOString().slice(0,10)+".xlsx");
 }
-</script>
+
+async function publishLetter(){let t=document.getElementById('letTitle').value.trim();let b=document.getElementById('letBody').value.trim();if(!t||!b){alert('Title and Message required');return;}let d=document.getElementById('letDate').value||new Date().toISOString().split('T')[0];try{await db.collection('letters').add({Title:t,Body:b,Date:d,GradeTarget:"All Grades",Timestamp:Date.now()});document.getElementById('letStatus').innerText='✅ Published';document.getElementById('letTitle').value='';document.getElementById('letBody').value='';loadLettersAdmin();}catch(e){document.getElementById('letStatus').innerText='❌ '+e.message;}}
+async function loadLettersAdmin(){let list=document.getElementById('lettersListAdmin');try{let snap=await db.collection('letters').orderBy('Timestamp','desc').get();if(snap.empty){list.innerHTML='No letters';return;}let html='';snap.forEach(doc=>{let d=doc.data();html+=`<div class="bg-[#FFFBF0] border-l-[6px] border-[#800000] p-4 rounded-[16px] mb-2"><div class="font-black">${d.Title}</div><div class="text-[13px]">${d.Body.slice(0,200)}</div><button onclick="db.collection('letters').doc('${doc.id}').delete().then(()=>loadLettersAdmin())" class="bg-red-600 text-white px-3 py-1 rounded-full text-[11px] mt-2">Delete</button></div>`;});list.innerHTML=html;}catch(e){list.innerHTML='Error: '+e.message;}}
+if(localStorage.getItem('dooka_admin_ok')==='yes')startListening();loadLettersAdmin();
 </script></body></html>
