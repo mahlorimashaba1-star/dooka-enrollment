@@ -1,5 +1,5 @@
 <!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dooka ADMIN 2026 - LIVE SYNC FIXED</title>
+<title>Dooka ADMIN 2026 - </title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -46,7 +46,7 @@
 <div class="bg-white border-[3px] border-[#FFD700] rounded-[24px] p-6 shadow-sm">
 <div class="flex items-center gap-3"><div class="w-12 h-12 bg-[#FFD700] rounded-full flex items-center justify-center text-xl">⭐</div><div><h3 class="font-black text-[#800000] text-[18px]">SA-SAMS / LURITS EXPORT - FIXED FOR EXCEL</h3><p class="text-[12px] text-gray-600">Exports ONLY Approved learners with all required SA-SAMS fields - Excel will now open it correctly</p></div></div>
 <div class="grid md:grid-cols-2 gap-3 mt-5">
-<button onclick="exportSAMS()" class="bg-[#FFD700] border-2 border-[#800000] text-[#800000] py-4 rounded-full font-black shadow">⭐ EXPORT APPROVED FOR SA-SAMS (Excel Fixed)</button>
+<button onclick="exportSAMS()" class="bg-[#FFD700] border-2 border-[#800000] text-[#800000] py-4 rounded-full font-black shadow">⭐ EXPORT APPROVED FOR SA-SAMS</button>
 <button onclick="exportSAMSAll()" class="bg-[#0F0F0F] text-white py-4 rounded-full font-black">Export ALL - Backup CSV (Excel Fixed)</button>
 </div>
 </div>
@@ -130,35 +130,56 @@ db.collection("enrollments").orderBy("Timestamp","desc").onSnapshot(snap=>{
 function openDoc(src){document.getElementById('docModalImg').src=src;document.getElementById('docModal').style.display='flex';document.getElementById('docModal').classList.remove('hidden');document.getElementById('docModal').classList.add('flex');}
 function updateStatus(id,status){db.collection("enrollments").doc(id).update({Status:status});}
 
-function exportSAMS(){
-if(allApproved.length==0)return alert("No APPROVED learners");
-let headers = ["Surname","First Names","Learner ID","Birth Certificate No","Date of Birth","Gender","Race","Home Language","Grade","Class","Parent Name","Parent ID","Parent Cell","WhatsApp","Parent Phone2","Address","Admission No","Status","Notes"];
-let csv = headers.map(esc).join(",")+"\n";
-allApproved.forEach(a=>{
-  let row = [
-    a.Surname, a.Name, a.LearnerID, a.LearnerID,
-    formatDOB(a.DOB),
-    (a.Gender||"").toUpperCase().startsWith("F")?"F":"M",
-    a.Race, a.HomeLanguage,
-    (a.Grade||"").replace("Grade ","").trim(),
-    "", a.ParentName, a.ParentID, a.ParentPhone, a.WhatsApp||a.ParentPhone, a.ParentPhone2||"", a.Address, a.AdmissionNo, "ENROLLED", ""
-  ];
-  csv += row.map(esc).join(",")+"\n";
-});
-downloadCSV("Dooka_APPROVED_SA-SAMS_"+new Date().toISOString().slice(0,10)+".csv", csv);
-}
-function exportSAMSAll(){
-let all=[...allPending,...allApproved];if(all.length==0)return alert("No data!");
-let headers = ["Surname","First Names","Learner ID","Date of Birth","Gender","Race","Home Language","Grade","Parent Name","Parent Cell","Admission No","Status","Full Address"];
-let csv = headers.map(esc).join(",")+"\n";
-all.forEach(a=>{
-  let row=[a.Surname,a.Name,a.LearnerID,formatDOB(a.DOB),(a.Gender||"").charAt(0).toUpperCase(),a.Race,a.HomeLanguage,(a.Grade||"").replace("Grade ",""),a.ParentName,a.ParentPhone,a.AdmissionNo,a.Status||"Pending",a.Address];
-  csv+=row.map(esc).join(",")+"\n";
-});
+);
 downloadCSV("Dooka_ALL_Backup_"+new Date().toISOString().slice(0,10)+".csv", csv);
 }
 async function publishLetter(){let t=document.getElementById('letTitle').value.trim();let b=document.getElementById('letBody').value.trim();let d=document.getElementById('letDate').value||new Date().toISOString().split('T')[0];let g=document.getElementById('letGrade').value;let fileInput=document.getElementById('letFile');if(!t||!b){alert('Title and Message required');return;}document.getElementById('letStatus').innerText='⏳ Publishing...';try{let fileName="",fileData="";if(fileInput.files.length>0){let file=fileInput.files[0];if(file.size>900*1024){alert("PDF too big! Max 900KB");return;}fileData=await new Promise((res,rej)=>{let r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=rej;r.readAsDataURL(file);});fileName=file.name;}await db.collection('letters').add({Title:t,Body:b,Date:d,GradeTarget:g,FileName:fileName,FileData:fileData,Timestamp:Date.now()});document.getElementById('letStatus').innerText='✅ Published LIVE!';document.getElementById('letTitle').value='';document.getElementById('letBody').value='';document.getElementById('letFile').value='';document.getElementById('fileName').innerText='';loadLettersAdmin();}catch(e){document.getElementById('letStatus').innerText='❌ '+e.message;}}
 document.getElementById('letFile').addEventListener('change',function(){if(this.files.length>0){let sz=this.files[0].size;let el=document.getElementById('fileName');if(sz>900*1024){el.innerText='❌ Too big: '+(sz/1024).toFixed(0)+'KB';el.style.color='red';}else{el.innerText='📄 '+this.files[0].name+' ('+(sz/1024).toFixed(0)+'KB) OK';el.style.color='green';}}});
 async function loadLettersAdmin(){let list=document.getElementById('lettersListAdmin');try{let snap=await db.collection('letters').orderBy('Timestamp','desc').get();document.getElementById('letterCount').innerText=snap.size;if(snap.empty){list.innerHTML='<div class="bg-white p-6 rounded-[16px] text-center text-gray-500">No letters yet</div>';return;}let html='';snap.forEach(doc=>{let d=doc.data();let pdfBtn='';if(d.FileData){pdfBtn=`<a href="${d.FileData}" download="${d.FileName}" class="block bg-[#800000] text-white p-2.5 text-center rounded-xl font-bold mt-2 text-xs">📥 DOWNLOAD PDF: ${d.FileName}</a>`;}html+=`<div class="bg-[#FFFBF0] border-l-[6px] border-[#800000] p-4 rounded-[16px] shadow-sm"><div class="text-[11px] text-gray-500 font-bold">📅 ${d.Date} | ${d.GradeTarget}</div><div class="font-black text-[#800000] mt-1">${d.Title}</div><div class="text-[13px] whitespace-pre-wrap mt-1">${d.Body.slice(0,200)}</div>${pdfBtn}<button onclick="if(confirm('Delete?')){db.collection('letters').doc('${doc.id}').delete().then(()=>loadLettersAdmin())}" class="bg-red-600 text-white px-3 py-1 rounded-full text-[11px] font-black mt-2">🗑 DELETE</button></div>`;});list.innerHTML=html;}catch(e){list.innerHTML='❌ '+e.message;}}
 if(localStorage.getItem('dooka_admin_ok')==='yes')startListening();loadLettersAdmin();
+
+<!-- SheetJS for REAL Excel files -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+function esc(v){ if(v==null) return ""; return String(v).trim(); }
+function formatDOB(d){ if(!d) return ""; if(d.includes('-')){ let p=d.split('-'); if(p.length===3) return p[2]+'/'+p[1]+'/'+p[0]; } return d; }
+function downloadCSV(filename, csvContent){ let blob=new Blob(["\uFEFF"+csvContent],{type:"text/csv;charset=utf-8;"}); let a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=filename; a.click(); }
+
+function exportSAMS(){
+  if(allApproved.length==0) return alert("No APPROVED learners");
+  // Create worksheet data as array-of-arrays - this is what SA-SAMS expects
+  const headers = ["Surname","First Names","Learner ID","Birth Certificate No","Date of Birth","Gender","Race","Home Language","Grade","Class","Parent Name","Parent ID","Parent Cell","WhatsApp","Parent Phone2","Address","Admission No","Status","Notes"];
+  const rows = [headers];
+  allApproved.forEach(a=>{
+    rows.push([
+      a.Surname||"", a.Name||"", a.LearnerID||"", a.LearnerID||"",
+      formatDOB(a.DOB), (a.Gender||"").toUpperCase().startsWith("F")?"F":"M",
+      a.Race||"", a.HomeLanguage||"",
+      (a.Grade||"").replace("Grade ","").trim(), "",
+      a.ParentName||"", a.ParentID||"", a.ParentPhone||"", a.WhatsApp||a.ParentPhone||"", a.ParentPhone2||"", a.Address||"", a.AdmissionNo||"", "ENROLLED", ""
+    ]);
+  });
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  // Auto width
+  ws['!cols'] = headers.map(h=>({wch: Math.max(12, h.length+2)}));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "SA-SAMS Approved");
+  XLSX.writeFile(wb, "Dooka_APPROVED_SA-SAMS_"+new Date().toISOString().slice(0,10)+".xlsx");
+}
+
+function exportSAMSAll(){
+  let all=[...allPending,...allApproved];
+  if(all.length==0) return alert("No data!");
+  const headers = ["Surname","First Names","Learner ID","Date of Birth","Gender","Race","Home Language","Grade","Parent Name","Parent Cell","Admission No","Status","Full Address"];
+  const rows = [headers];
+  all.forEach(a=>{
+    rows.push([a.Surname||"", a.Name||"", a.LearnerID||"", formatDOB(a.DOB), (a.Gender||"").charAt(0).toUpperCase(), a.Race||"", a.HomeLanguage||"", (a.Grade||"").replace("Grade ",""), a.ParentName||"", a.ParentPhone||"", a.AdmissionNo||"", a.Status||"Pending", a.Address||""]);
+  });
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = headers.map(h=>({wch: 15}));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "All Learners");
+  XLSX.writeFile(wb, "Dooka_ALL_Backup_"+new Date().toISOString().slice(0,10)+".xlsx");
+}
+</script>
 </script></body></html>
